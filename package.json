@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev_mongo": "node src/config/mongodb.js",
+    "dev_warehouse": "node src/warehouse/warehouse.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,6 +17,10 @@
     "joi": "^17.9.2",
     "jquery": "^3.7.0",
     "lodash": "^4.17.21",
+    "mongodb": "^5.8.1",
     "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "prettier": "3.0.2"
   }
 }
