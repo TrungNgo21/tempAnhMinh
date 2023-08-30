@@ -1,15 +1,3 @@
-const mongodb = require('mongodb');
-const { MongoClient } = require('mongodb');
-
-//uri for local mongodb
-const uri = 'mongodb://127.0.0.1:27017/';
-const getClient = (uri) => {
-    return new MongoClient(uri, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    });
-};
-
 async function listDatabases(client) {
     databasesList = await client.db().admin().listDatabases();
     console.log('Databases:');
