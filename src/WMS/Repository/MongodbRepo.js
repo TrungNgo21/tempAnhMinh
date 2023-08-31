@@ -1,63 +1,123 @@
-const getMongoConn = require('../../config/Connector');
-const mongoose = require('mongoose');
-const CateDTO = require('../DTO/CateDTO.js');
-const cred = {
-    whadmin: 'CnSNL2Dw50Hd9gui',
-    staff: 'vVlOlqte0giTh1IQ',
-    customer: 'vVlOlqte0giTh1IQ',
-    test: 'test',
-};
-
-const testCate = new CateDTO(
-    'test cate 3',
-    null,
-    [
-        { name: 'attribute 1', value: '1' },
-        { name: 'attribute 2', value: '2' },
-    ],
-    []
-);
+const { getMongoConn } = require('../../config/Connector');
+const updateCateDTO = require('../DTO/UpdateCateDTO.js');
+const updateProductDTO = require('../DTO/UpdateProductDTO');
 
 async function updateCategory(user, cateDTO) {
-    const conn = getMongoConn('whadmin', 'CnSNL2Dw50Hd9gui');
+    const conn = await getMongoConn(user);
+
+    try {
+        const vResult = await conn.cate.validateUpdate(cateDTO, conn.product);
+        if (!vResult.valid) return { error: true, message: 'categories contain products', id: vResult.id };
+
+        const result = await conn.cate
+            .findOneAndUpdate(
+                { name: cateDTO.getName(), parentId: cateDTO.getParentId() },
+                { name: cateDTO.getName(), parentId: cateDTO.getParentId(), attribute: cateDTO.getAttribute() },
+                { upsert: true, new: true }
+            )
+            .lean()
+            .exec();
+
+        if (result._id == null) return { id: vResult._id, error: false };
+        return { id: result._id, error: false };
+    } catch (e) {
+        return { error: true, message: e.message };
+    }
 }
 
 async function getAllCate(user) {
+    const conn = await getMongoConn(user);
+
     try {
-        const client = mongo.getMongoClient(user, cred[user]);
-        const db = client.db('application');
-        const categories = await db.collection('category').find();
-        for await (const doc of categories) {
-            console.log(doc);
-        }
-        await client.close();
-        return { result: categories.toArray(), error: false };
+        conn.cate
+            .find()
+            .sort({ name: 1 })
+            .then((result) => {
+                return { result: JSON.stringify(result), error: false };
+            });
     } catch (e) {
-        console.error(e.message);
         return { error: true, message: e.message };
     }
 }
 
-async function addCategory(user, cateDTO) {
-    try {
-        const client = mongo.getMongoClient(user, cred[user]);
-        const db = client.db('application');
-        const doc = {
-            name: cateDTO.getName(),
-            parentId: cateDTO.getParentId(),
-            attribute: cateDTO.getAttribute(),
-            parentAttribute: cateDTO.getParentAttribute(),
-        };
-        const result = await db.collection('category').updateOne({ name: doc.name }, { $set: doc }, { upsert: true });
+async function getAllProduct(user) {
+    const conn = await getMongoConn(user);
 
-        await client.close();
-        return { result: result.insertedId, error: false };
+    try {
+        conn.product
+            .find()
+            .sort({ name: 1 })
+            .then((ressult) => {
+                return { result: JSON.stringify(result), error: false };
+            });
     } catch (e) {
-        console.log(e.message);
         return { error: true, message: e.message };
     }
 }
 
-console.log(addCategory('whadmin', testCate).result);
+async function updateProduct(user, productDTO) {
+    const conn = await getMongoConn(user);
 
-console.log(getAllCate('whadmin').result);
+    try {
+        conn.product.validateUpdate(productDTO, conn.cate).then((valid) => {
+            if (!valid) return { error: true, message: 'product attribute not match with category' };
+
+            const result = conn.product
+                .findOneAndUpdate(
+                    { name: productDTO.getName(), brand: productDTO.getBrand(), category: productDTO.getCategory() },
+                    {
+                        name: productDTO.getName(),
+                        brand: productDTO.getBrand(),
+                        price: productDTO.getPrice(),
+                        dimension: productDTO.getDimension(),
+                        color: productDTO.getColor(),
+                        category: productDTO.getCategory(),
+                        attribute: productDTO.getAttribute(),
+                        parentAttribute: productDTO.getParentAttribute(),
+                    },
+                    { upsert: true }
+                )
+                .lean()
+                .exec();
+
+            return { result: result, error: false };
+        });
+    } catch (e) {
+        return { error: true, message: e.message };
+    }
+}
+
+const testCate = new updateCateDTO('test cate 1', null, [{ name: 'attribute 1' }, { name: 'attribute 2' }]);
+
+updateCategory('whadmin', testCate).then((result) => {
+    const testRefCate = new updateCateDTO('test cate 2', result.id, [{ name: 'attribute 3' }, { name: 'attribute 4' }]);
+
+    const testProduct = new updateProductDTO(
+        'test product 1',
+        'test brand 1',
+        10000,
+        {
+            width: 0.4,
+            height: 2,
+            length: 0.5,
+        },
+        'blue',
+        result.id,
+        [
+            { name: 'attribute 1', value: 'some attribute' },
+            { name: 'attribute 2', value: 'some other attribute' },
+            { name: 'attribute 3', value: 'some other attributes' },
+        ],
+        []
+    );
+
+    updateCategory('whadmin', testRefCate).then((e) => {
+        console.log('update here');
+
+        updateProduct('staff', testProduct).then();
+    });
+});
+
+// const result = getAllProduct('staff').then((i) => {
+//     console.log(i);
+// });
