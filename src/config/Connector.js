@@ -1,12 +1,36 @@
-const { mongoose } = require('mongoose');
+const mongoose = require('mongoose');
+const Category = require('../schema/Category').model;
+const Product = require('../schema/Product').model;
 
-export function getMongoConn(u, p) {
-    const username = encodeURIComponent(u);
-    const password = encodeURIComponent(p);
+const cred = {
+    whadmin: 'CnSNL2Dw50Hd9gui',
+    staff: 'vVlOlqte0giTh1IQ',
+    customer: 'vVlOlqte0giTh1IQ',
+    test: 'test',
+};
+
+async function getMongoConn(user) {
+    const username = encodeURIComponent(user);
+    const password = encodeURIComponent(cred[user]);
 
     const url = '127.0.0.1:27017';
     const authMechanism = 'SCRAM-SHA-256';
 
-    const uri = `mongodb://${username}:${password}@${url}/?authMechanism=${authMechanism}`;
-    return mongoose.connect(uri);
+    const uri = `mongodb://${url}/`;
+    const options = {
+        user: username,
+        pass: password,
+        authMechanism: authMechanism,
+        dbName: 'application',
+        autoIndex: true,
+    };
+
+    const conn = await mongoose.createConnection(uri, options).asPromise();
+
+    const cate = Category(conn);
+    const product = Product(conn);
+
+    return { conn: conn, cate: cate, product: product };
 }
+
+module.exports = { getMongoConn };
