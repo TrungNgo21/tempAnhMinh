@@ -38,3 +38,17 @@ create table TransactionDetail(
     foreign key (ID) references Transaction(ID)
 );
 
+
+insert into WarehouseInventory values
+(156, 2, 'shoes', 1500),
+(965532, 1, 'key', 5600),
+(1653, 3, 'lotion', 8452),
+(4892, 3, 'egg', 25200),
+(216854, 1, 'screen', 300),
+(52319, 3, 'necklace', 560),
+(423156, 2, 'teddy', 259616);
+
+insert into Warehouse values
+(1, 'Peter', '17', 'Tan Binh', 'TPHCM', 10000, 12000),
+(2, 'Sans', '161', 'Thu Duc', 'TPHCM', 28200, 30000),
+(3, 'Michael', '82', 'Thanh Xuan', 'Ha Noi', 15600, 25000);
