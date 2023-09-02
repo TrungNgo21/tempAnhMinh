@@ -17,11 +17,14 @@ const productSchema = new Schema(
     {
         statics: {
             async validateUpdate(updateProductDTO, category) {
-                const result = await category.findOne({ _id: updateProductDTO.category }, 'parentId attribute');
-                let attribute = result.attribute;
+                const result = await category
+                    .find({ _id: updateProductDTO.category }, 'parentId attribute')
+                    .lean()
+                    .exec();
+                const attribute = result[0].attribute;
                 let pAttribute;
-                if (result.parentId != null) {
-                    pAttribute = await category.findOne({ _id: result.parentId }, 'attribute');
+                if (result[0].parentId != null) {
+                    pAttribute = await category.findOne({ _id: result[0].parentId }, 'attribute');
                 } else pAttribute = [];
 
                 if (
@@ -30,16 +33,18 @@ const productSchema = new Schema(
                 ) {
                     return false;
                 }
-                for (a in attribute) {
+                attribute.forEach((a) => {
                     if (!updateProductDTO.attribute.has(a.name)) {
                         return false;
                     }
-                }
-                for (a in pAttribute) {
+                });
+
+                pAttribute.forEach((a) => {
                     if (!updateProductDTO.parentAttribute.has(a.name)) {
                         return false;
                     }
-                }
+                });
+
                 return true;
                 // const pAttribute = await result.getParentAttribute(result.model.parentId);
                 // const attribute = result.attribute;

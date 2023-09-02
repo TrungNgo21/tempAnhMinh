@@ -8,14 +8,25 @@ const categorySchema = new Schema(
     },
     {
         statics: {
-            validateUpdate(cateDTO, product) {
-                const result = this.find({ name: cateDTO.name, parentId: cateDTO.parentId }, '_id').lean();
+            async validateDelete(id, product) {
+                const result = await this.findById(id).lean().exec();
+                if (result == null) return { valid: false, id: null };
 
-                if (result == null) {
-                    return { valid: true, id: null };
-                }
+                const isParent = await this.countDocuments({ parentId: id }).lean().exec();
+                if (isParent != 0) return { valid: false, id: id };
 
-                return { valid: product.find({ category: result._id }), id: result._id };
+                const prodCount = await product.countDocuments({ category: result._id }).lean().exec();
+
+                return { valid: prodCount == 0, id: result._id };
+            },
+            async validateUpdate(cateDTO, product) {
+                const result = await this.find({ name: cateDTO.name, parentId: cateDTO.parentId }, '_id').lean().exec();
+
+                if (result.length == 0) return { valid: true, id: null };
+
+                const prodCount = await product.countDocuments({ category: result[0]._id }).lean().exec();
+
+                return { valid: prodCount == 0, id: result[0]._id };
             },
             getProducts(product) {
                 return product.find({ category: this._id });
