@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const Category = require('../schema/Category').model;
-const Product = require('../schema/Product').model;
+const Category = require('../../schema/Category').model;
+const Product = require('../../schema/Product').model;
 
 const cred = {
     whadmin: 'CnSNL2Dw50Hd9gui',
@@ -33,4 +33,4 @@ async function getMongoConn(user) {
     return { conn: conn, cate: cate, product: product };
 }
 
-module.exports = { getMongoConn };
+module.exports = getMongoConn;

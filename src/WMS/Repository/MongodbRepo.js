@@ -1,5 +1,6 @@
-const { getMongoConn } = require('../../config/Connector');
-
+const getMongoConn = require('../../config/mongodb/Connector');
+const updateCateDTO = require('../DTO/UpdateCateDTO');
+const updateProductDTO = require('../DTO/UpdateProductDTO');
 async function updateCategory(user, cateDTO) {
     const conn = await getMongoConn(user);
 
@@ -102,47 +103,47 @@ async function updateProduct(user, productDTO) {
         return { error: true, message: e.message };
     }
 }
-//
-// let testCate = new updateCateDTO('test cate 1', null, [{ name: 'attribute 1' }, { name: 'attribute 2' }]);
-//
-// updateCategory('whadmin', testCate).then((result) => {
-//     const testRefCate = new updateCateDTO('test cate 2', result.id, [{ name: 'attribute 3' }, { name: 'attribute 4' }]);
-//
-//     const testProduct = new updateProductDTO(
-//         'test product 1',
-//         'test brand 1',
-//         10000,
-//         {
-//             width: 0.4,
-//             height: 2,
-//             length: 0.5,
-//         },
-//         'blue',
-//         result.id,
-//         [
-//             { name: 'attribute 1', value: 'some attribute' },
-//             { name: 'attribute 2', value: 'some other attribute' },
-//         ],
-//         []
-//     );
-//
-//     updateCategory('whadmin', testRefCate).then((e) => {
-//         deleteCategory('whadmin', result.id)
-//             .then((e) => {
-//                 console.log(e.message);
-//             })
-//             .then((e) => {
-//                 updateProduct('whadmin', testProduct).then();
-//             });
-//     });
-// });
-//
-// testCate = new updateCateDTO('test cate 3', null, [{ name: 'attribute 1' }, { name: 'attribute 2' }]);
-//
-// updateCategory('whadmin', testCate).then((r) => {
-//     deleteCategory('whadmin', r.id).then();
-// });
-//
-// const result = getAllProduct('staff').then((i) => {
-//     console.log(i);
-// });
+
+let testCate = new updateCateDTO('test cate 1', null, [{ name: 'attribute 1' }, { name: 'attribute 2' }]);
+
+updateCategory('whadmin', testCate).then((result) => {
+    const testRefCate = new updateCateDTO('test cate 2', result.id, [{ name: 'attribute 3' }, { name: 'attribute 4' }]);
+
+    const testProduct = new updateProductDTO(
+        'test product 1',
+        'test brand 1',
+        10000,
+        {
+            width: 0.4,
+            height: 2,
+            length: 0.5,
+        },
+        'blue',
+        result.id,
+        [
+            { name: 'attribute 1', value: 'some attribute' },
+            { name: 'attribute 2', value: 'some other attribute' },
+        ],
+        []
+    );
+
+    updateCategory('whadmin', testRefCate).then((e) => {
+        deleteCategory('whadmin', result.id)
+            .then((e) => {
+                console.log(e.message);
+            })
+            .then((e) => {
+                updateProduct('whadmin', testProduct).then();
+            });
+    });
+});
+
+testCate = new updateCateDTO('test cate 3', null, [{ name: 'attribute 1' }, { name: 'attribute 2' }]);
+
+updateCategory('whadmin', testCate).then((r) => {
+    deleteCategory('whadmin', r.id).then();
+});
+
+const result = getAllProduct('staff').then((i) => {
+    console.log(i);
+});
