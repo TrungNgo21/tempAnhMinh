@@ -1,3 +1,5 @@
+drop database if exists public;
+create database public;
 use public;
 drop table if exists WarehouseInventory;
 drop table if exists warehouse;
@@ -49,44 +51,19 @@ drop procedure if exists common_update_volume; //
 create procedure common_update_volume(in warehouse_id bigint)
 begin
     update warehouse
-    set fillVolume = (
-        select sum(w.ivolume) as wvolume
-        from (
-                 select wi.warehouseID as warehouseId, (p.volume*wi.quantity) as ivolume
-                 from warehouseinventory wi
-                          join product p on wi.productID = p.id
-                 where warehouseID = warehouse_id
-                 group by p.id, warehouseID) w
-        group by w.warehouseId)
-    where ID = warehouse_id;
-end; //
-
-drop trigger if exists update_warehouse_volume; //
-create trigger update_warehouse_volume
-    after update on warehouseinventory
-    for each row
-    call common_update_volume(new.warehouseID); //
-
-drop trigger if exists insert_warehouse_volume; //
-create trigger insert_warehouse_volume
-    after insert on warehouseinventory
-    for each row
-    call common_update_volume(new.warehouseID); //
-
-drop procedure if exists common_update_volume; //
-create procedure common_update_volume(in warehouse_id bigint)
-begin
-    update warehouse
-    set fillVolume = (
-        select sum(w.ivolume) as wvolume
-        from (
-                 select wi.warehouseID as warehouseId, (p.volume*wi.quantity) as ivolume
-                 from warehouseinventory wi
-                          join product p on wi.productID = p.id
-                 where warehouseID = warehouse_id
-                 group by p.id, warehouseID) w
-        group by w.warehouseId)
-    where ID = warehouse_id;
+    set fillVolume =
+        (
+            select
+                sum(w.ivolume) as wvolume
+            from (
+                select
+                    (p.volume*wi.quantity) as ivolume
+                from warehouseinventory wi
+                    join product p on wi.productID = p.id
+                where warehouseID = warehouse_id
+                group by wi.id, warehouseID) w
+        )
+        where ID = warehouse_id;
 end; //
 
 drop trigger if exists update_warehouse_volume; //
