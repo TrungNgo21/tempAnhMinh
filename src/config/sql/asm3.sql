@@ -5,42 +5,42 @@ drop table if exists WarehouseInventory;
 drop table if exists warehouse;
 drop table if exists TransactionDetail;
 drop table if exists Transaction;
+drop table if exists product;
 
 create table warehouse(
-	ID int primary key AUTO_INCREMENT,
-	Name text not null,
-	Address text not null,
-	City text not null,
-	Province text not null,
-	Volume bigint not null,
+	id int primary key AUTO_INCREMENT,
+	name text not null,
+	address text not null,
+	city text not null,
+	province text not null,
+	volume bigint not null,
 	fillVolume bigint not null default 0
 );
 
 create table WarehouseInventory(
-	ID bigint primary key AUTO_INCREMENT,
+	id bigint primary key AUTO_INCREMENT,
 	warehouseID int not null,
     productID varchar(24) not null,
 	quantity bigint not null,
-    foreign key (warehouseID) references warehouse(ID)
+    foreign key (warehouseID) references warehouse(id)
 );
 
 create table Transaction(
-	ID bigint primary key AUTO_INCREMENT,
-	date datetime not null,
+	id bigint primary key AUTO_INCREMENT,
+	date timestamp not null default now(),
     quantity int not null,
     price bigint not null
 );
 
 create table TransactionDetail(
-	ID bigint primary key AUTO_INCREMENT,
-	transID bigint not null,
-    productID varchar(24) not null,
+	id bigint primary key AUTO_INCREMENT,
+	transId bigint not null,
+    productId varchar(24) not null,
     quantity int not null,
     price bigint not null,
-    foreign key (ID) references Transaction(ID)
+    foreign key (id) references Transaction(id)
 );
 
-drop table if exists product;
 create table product (
     id varchar(24) primary key,
     volume bigint
@@ -95,26 +95,33 @@ begin
         select (Volume > fillVolume) into c from warehouse where warehouse.ID = to_wh;
 
         if !c then
-            rollback ;
-        elseif _rollback = 1 then
+            set _rollback = 1;
+        end if;
+
+        if _rollback = 1 then
             rollback;
+            select true as err;
         else
             commit;
+            select false as err;
         end if;
+
     else
         start transaction;
         update warehouseinventory set quantity = quantity - qty where warehouseID = from_wh and productID = product_id;
         if _rollback = 1 then
             rollback;
+            select true as err;
         else
             insert into warehouseinventory (warehouseID, productID, quantity) values (to_wh, product_id, qty);
             commit;
+            select false as err;
         end if;
     end if;
 end; //
 
 drop procedure if exists product_purchase_order //
-create procedure product_purchase_order(in product_id varchar(24), in qty bigint, out err bool, out message text)
+create procedure product_purchase_order(in product_id varchar(24), in qty bigint)
 begin
     declare wid bigint;
     declare iqty bigint default 0;
@@ -145,12 +152,10 @@ begin
         end while;
     if _rollback = 1 then
         rollback;
-        set err = true;
-        set message = 'inventory exceed all warehouse capacity';
+        select true as err, 'inventory exceed all warehouse capacity' as message;
     else
         commit;
-        set err = false;
-        set message = 'PO success';
+        select false as err, 'PO success' as message;
     end if;
     drop temporary table if exists temp;
 end; //
