@@ -9,42 +9,49 @@ drop table if exists product;
 
 create table warehouse(
 	id int primary key AUTO_INCREMENT,
-	name text not null,
-	address text not null,
-	city text not null,
-	province text not null,
+	name varchar(100) not null,
+	address varchar(95) not null,
+	city varchar(35) not null,
+	province varchar(35) not null,
 	volume bigint not null,
-	fillVolume bigint not null default 0
+	fillVolume bigint not null default 0,
+	unique (address, city, province)
 );
 
-create table WarehouseInventory(
+create table warehouse_inventory(
 	id bigint primary key AUTO_INCREMENT,
 	warehouseID int not null,
     productID varchar(24) not null,
 	quantity bigint not null,
-    foreign key (warehouseID) references warehouse(id)
+    foreign key (warehouseID) references warehouse(id),
+    unique (warehouseID, productID)
 );
 
-create table Transaction(
+create table transaction(
 	id bigint primary key AUTO_INCREMENT,
 	date timestamp not null default now(),
     quantity int not null,
-    price bigint not null
+    price bigint not null,
+    unique (id, date)
 );
 
-create table TransactionDetail(
+create table transaction_detail(
 	id bigint primary key AUTO_INCREMENT,
 	transId bigint not null,
     productId varchar(24) not null,
     quantity int not null,
     price bigint not null,
-    foreign key (id) references Transaction(id)
+    foreign key (id) references Transaction(id),
+    unique (transId, productId)
 );
 
 create table product (
     id varchar(24) primary key,
     volume bigint
 );
+
+create index warehouse_search_index on warehouse (name, address, city, province);
+create index inventory_search_index on warehouse_inventory (warehouseID, productID);
 
 delimiter //
 drop procedure if exists common_update_volume; //
@@ -58,7 +65,7 @@ begin
             from (
                 select
                     (p.volume*wi.quantity) as ivolume
-                from warehouseinventory wi
+                from warehouse_inventory wi
                     join product p on wi.productID = p.id
                 where warehouseID = warehouse_id
                 group by wi.id, warehouseID) w
@@ -68,15 +75,25 @@ end; //
 
 drop trigger if exists update_warehouse_volume; //
 create trigger update_warehouse_volume
-    after update on warehouseinventory
+    after update on warehouse_inventory
     for each row
     call common_update_volume(new.warehouseID); //
 
 drop trigger if exists insert_warehouse_volume //
 create trigger insert_warehouse_volume
-    after insert on warehouseinventory
+    after insert on warehouse_inventory
     for each row
     call common_update_volume(new.warehouseID); //
+
+drop trigger if exists ensure_warehouse_volume_validity //
+create trigger ensure_warehouse_volume_validity
+    before update on warehouse
+    for each row
+    begin
+        if NEW.volume < old.fillVolume then
+            signal sqlstate '45000' set message_text = 'old volume cant be smaller than filled volume';
+        end if;
+    end //
 
 drop procedure  if exists product_transfer //
 create procedure product_transfer (in product_id varchar(24), in from_wh bigint, in to_wh bigint, in qty bigint)
@@ -86,11 +103,11 @@ begin
     declare _rollback bool default 0;
     declare continue handler for sqlexception set _rollback = 1;
 
-    select count(warehouseID) into i from warehouseinventory where warehouseID = to_wh and productID = product_id;
+    select count(warehouseID) into i from warehouse_inventory where warehouseID = to_wh and productID = product_id;
     if i != 0 then
         start transaction;
-        update warehouseinventory set quantity = quantity - qty where warehouseID = from_wh and productID = product_id;
-        update warehouseinventory set quantity = quantity + qty where warehouseID = to_wh and productID = product_id;
+        update warehouse_inventory set quantity = quantity - qty where warehouseID = from_wh and productID = product_id;
+        update warehouse_inventory set quantity = quantity + qty where warehouseID = to_wh and productID = product_id;
 
         select (Volume > fillVolume) into c from warehouse where warehouse.ID = to_wh;
 
@@ -108,12 +125,12 @@ begin
 
     else
         start transaction;
-        update warehouseinventory set quantity = quantity - qty where warehouseID = from_wh and productID = product_id;
+        update warehouse_inventory set quantity = quantity - qty where warehouseID = from_wh and productID = product_id;
         if _rollback = 1 then
             rollback;
             select true as err;
         else
-            insert into warehouseinventory (warehouseID, productID, quantity) values (to_wh, product_id, qty);
+            insert into warehouse_inventory (warehouseID, productID, quantity) values (to_wh, product_id, qty);
             commit;
             select false as err;
         end if;
@@ -123,32 +140,34 @@ end; //
 drop procedure if exists product_purchase_order //
 create procedure product_purchase_order(in product_id varchar(24), in qty bigint)
 begin
-    declare wid bigint;
     declare iqty bigint default 0;
     declare pvolume bigint default (select volume from product where id = product_id);
     declare _rollback bool default 0;
     declare continue handler for sqlexception set _rollback = 1;
-    set @enable = true;
 
     start transaction;
-
     while _rollback = 0 and iqty < qty do
             create temporary table temp select id from warehouse where Volume > (fillVolume + pvolume) group by id;
-            set @debug = (select count(id) from temp);
 
             if (select count(id) from temp) = 0 then
                 set _rollback = 1;
             else
                 set iqty = iqty + 1;
-                set wid = (select warehouseID from warehouseinventory where warehouseID in (select id from temp) and productID = product_id order by quantity, warehouseID
-                           limit 1);
-
-                if wid IS NOT NULL then
-                    update warehouseinventory set quantity = quantity + 1 where productID = product_id and warehouseID = wid;
+                set @wid = (select warehouseID
+                            from warehouse_inventory
+                            where warehouseID in (
+                                select id
+                                from (select id from temp) t)
+                              and productID = product_id
+                            order by quantity, warehouseID
+                            limit 1);
+                if @wid IS NOT NULL then
+                    update warehouse_inventory set quantity = quantity + 1 where productID = product_id and warehouseID = @wid;
                 else
-                    insert into warehouseinventory (warehouseID, productID, quantity) value ((select id from temp limit 1), product_id, 1);
+                    insert into warehouse_inventory (warehouseID, productID, quantity) value ((select id from temp limit 1), product_id, 1);
                 end if;
             end if;
+            drop temporary table if exists temp;
         end while;
     if _rollback = 1 then
         rollback;
@@ -168,15 +187,14 @@ insert into product values
                         ('necklace', 3),
                         ('screen', 5),
                         ('teddy', 1),
-                        ('key', 1),
-                        ('test', 4);
+                        ('key', 1);
 
 insert into Warehouse values
 (1, 'Peter', '17', 'Tan Binh', 'TPHCM', 10000, 0),
 (2, 'Sans', '161', 'Thu Duc', 'TPHCM', 28200, 0),
 (3, 'Michael', '82', 'Thanh Xuan', 'Ha Noi', 15600, 0);
 
-insert into WarehouseInventory values
+insert into warehouse_inventory values
 (156, 2, 'shoes', 1500),
 (965532, 1, 'key', 5600),
 (1653, 3, 'lotion', 2452),

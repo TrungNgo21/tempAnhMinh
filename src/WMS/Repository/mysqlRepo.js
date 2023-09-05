@@ -16,13 +16,13 @@ const CHOICE = {
     TRANSFER_INV: 5,
 };
 
-async function createProduct(user, updateProductDTO) {
+async function createProduct(user, createProductDTO) {
     const result = await query_wrapper(
         user,
-        `insert into product (id, volume) value ('${updateProductDTO.getId()}', '${updateProductDTO.getVolume()}')`
+        `insert into product (id, volume) value ('${createProductDTO.getId()}', '${createProductDTO.getVolume()}')`
     );
     if (result.affectedRows != 1) return { err: true, message: 'create product fail' };
-    return { err: false, message: 'create product success', id: result[0].id };
+    return { err: false, message: 'create product success', id: createProductDTO.getId() };
 }
 
 async function updateProduct(user, updateProductDTO) {
@@ -30,8 +30,8 @@ async function updateProduct(user, updateProductDTO) {
         user,
         `update product set volume = ${updateProductDTO.getVolume()} where id = '${updateProductDTO.getId()}'`
     );
-    if (result.affectedRows != 1) return { err: true, message: 'update fail' };
-    return { err: false, message: 'update success' };
+    if (result.affectedRows != 1) return { err: true, message: 'update product fail' };
+    return { err: false, message: 'update product success', id: updateProductDTO.getId() };
 }
 
 async function transferInvent(user, transferDTO) {
@@ -43,17 +43,16 @@ async function transferInvent(user, transferDTO) {
     return { err: false, message: 'transfer success' };
 }
 
-async function createWarehouse(user, updateWhDTO) {
+async function createWarehouse(user, CreateWhDTO) {
     const result = await query_wrapper(
         user,
         `insert into warehouse (name, address, city, province, volume) value (
-                '${updateWhDTO.getName()}', 
-                '${updateWhDTO.getAddress()}', 
-                '${updateWhDTO.getCity()}', 
-                '${updateWhDTO.getProvince()}', 
-                ${updateWhDTO.getVolume()})`
+                '${CreateWhDTO.getName()}', 
+                '${CreateWhDTO.getAddress()}', 
+                '${CreateWhDTO.getCity()}', 
+                '${CreateWhDTO.getProvince()}', 
+                ${CreateWhDTO.getVolume()})`
     );
-    console.log(result);
     if (result.affectedRows != 1) return { err: true, message: 'create warehouse fail' };
     return { err: false, message: 'create warehouse success', id: result.insertId };
 }
@@ -63,22 +62,24 @@ async function updateWarehouse(user, updateWhDTO) {
         user,
         `update warehouse 
                 set 
-                    name = '${updateWhDTO.getName()}' and 
-                    address = '${updateWhDTO.getAddress()}' and
-                    city = '${updateWhDTO.getCity()}' and 
-                    province = '${updateWhDTO.getProvince()}' and 
+                    name = '${updateWhDTO.getName()}', 
+                    address = '${updateWhDTO.getAddress()}',
+                    city = '${updateWhDTO.getCity()}', 
+                    province = '${updateWhDTO.getProvince()}', 
                     volume = ${updateWhDTO.getVolume()}
                 where id = ${updateWhDTO.getId()}`
     );
+    if (result.affectedRows != 1) return { err: true, message: 'update warehouse fail' };
+    return { err: false, message: 'update warehouse success', id: updateWhDTO.getId() };
 }
 
 async function updateInventory(user, updateInventoryDTO) {
     const result = await query_wrapper(
         user,
-        `call product_purchase_order (${updateInventoryDTO.getId()}, ${updateInventoryDTO.getQty()})`,
-        TYPE.ELSE
+        `call product_purchase_order ('${updateInventoryDTO.getId()}', ${updateInventoryDTO.getQty()})`
     );
-    return { err: result[0].err, message: result[0].message };
+    if (result[0].err) return { err: true, message: 'inventory exceed all warehouse capacity' };
+    return { err: false, message: 'PO success' };
 }
 
 async function query_wrapper(user, sql) {
@@ -105,8 +106,32 @@ async function test(user, aDTO, choice) {
     }
 }
 
-let updateWHDTO = new UpdateWarehouseDTO(13, 'test warehouse 2', '124 test', 'test city', 'test province', 20000);
+const createWHDTO = new UpdateWarehouseDTO(null, 'test warehouse', '123 test', 'test city', 'test province', 20000);
+const updateWHDTO = new UpdateWarehouseDTO(
+    3,
+    'test update warehouse',
+    'update address test',
+    'update city test',
+    'update province test',
+    30000
+);
+const createProdDTO = new MySqlUpdateProductDTO('test prod', 4);
+const updateProdDTO = new MySqlUpdateProductDTO('test prod', 5);
+const transferDTO = new TransferDTO('shoes', 2, 1, 100);
+const updateInventoryDTO = new UpdateInventoryDTO('test prod', 10);
 
-test('root', updateWHDTO, CHOICE.UPDATE_WH).then((r) => {
-    console.log(r);
-});
+const testArray = [
+    test('root', createWHDTO, CHOICE.CREATE_WH),
+    test('root', updateWHDTO, CHOICE.UPDATE_WH),
+    test('root', createProdDTO, CHOICE.CREATE_PROD),
+    test('root', updateProdDTO, CHOICE.UPDATE_PROD),
+    test('root', transferDTO, CHOICE.TRANSFER_INV),
+    test('root', updateInventoryDTO, CHOICE.UPDATE_INV),
+];
+Promise.resolve()
+    .then(async () => console.log(await testArray[0]))
+    .then(async () => console.log(await testArray[1]))
+    .then(async () => console.log(await testArray[2]))
+    .then(async () => console.log(await testArray[3]))
+    .then(async () => console.log(await testArray[4]))
+    .then(async () => console.log(await testArray[5]));
