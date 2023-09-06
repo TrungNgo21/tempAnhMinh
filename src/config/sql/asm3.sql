@@ -52,8 +52,17 @@ create table product (
 
 create index warehouse_search_index on warehouse (name, address, city, province);
 create index inventory_search_index on warehouse_inventory (warehouseID, productID);
-
 delimiter //
+drop trigger if exists delete_warehouse_validation;
+create trigger delete_warehouse_validation
+    before delete on warehouse
+    for each row
+begin
+    if (select count(warehouseID) from warehouse_inventory where warehouseID = old.id) != 0 then
+        signal sqlstate '45000' set message_text = 'warehouse contain inventory';
+    end if;
+end //
+
 drop procedure if exists common_update_volume; //
 create procedure common_update_volume(in warehouse_id bigint)
 begin
@@ -189,18 +198,18 @@ insert into product values
                         ('teddy', 1),
                         ('key', 1);
 
-insert into Warehouse values
-(1, 'Peter', '17', 'Tan Binh', 'TPHCM', 10000, 0),
-(2, 'Sans', '161', 'Thu Duc', 'TPHCM', 28200, 0),
-(3, 'Michael', '82', 'Thanh Xuan', 'Ha Noi', 15600, 0);
+insert into Warehouse (name, address, city, province, volume) values
+('Peter', '17', 'Tan Binh', 'TPHCM', 10000),
+('Sans', '161', 'Thu Duc', 'TPHCM', 28200),
+('Michael', '82', 'Thanh Xuan', 'Ha Noi', 15600);
 
-insert into warehouse_inventory values
-(156, 2, 'shoes', 1500),
-(965532, 1, 'key', 5600),
-(1653, 3, 'lotion', 2452),
-(4892, 3, 'egg', 2200),
-(216854, 1, 'screen', 300),
-(52319, 3, 'necklace', 560),
-(423156, 2, 'teddy', 15961);
+insert into warehouse_inventory (warehouseID, productID, quantity) values
+(2, 'shoes', 1500),
+(1, 'key', 5600),
+(3, 'lotion', 2452),
+(3, 'egg', 2200),
+(1, 'screen', 300),
+(3, 'necklace', 560),
+(2, 'teddy', 15961);
 
 
