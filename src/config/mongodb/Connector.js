@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const Category = require('../../schema/Category').model;
-const Product = require('../../schema/Product').model;
+const { CategoryModel } = require('./schema/Category');
+const { ProductModel } = require('./schema/Product');
 
 const cred = {
     whadmin: 'CnSNL2Dw50Hd9gui',
@@ -27,8 +27,8 @@ async function getMongoConn(user) {
 
     const conn = await mongoose.createConnection(uri, options).asPromise();
 
-    const cate = Category(conn);
-    const product = Product(conn);
+    const cate = CategoryModel(conn);
+    const product = ProductModel(conn);
 
     return { conn: conn, cate: cate, product: product };
 }

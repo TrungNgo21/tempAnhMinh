@@ -3,8 +3,9 @@ const { mongoose, Schema } = require('mongoose');
 const categorySchema = new Schema(
     {
         name: String,
-        parentId: mongoose.Schema.Types.ObjectId,
+        parentId: { type: Schema.Types.ObjectId, ref: 'categories' },
         attribute: [{}],
+        products: [{ type: Schema.Types.ObjectId, ref: 'products' }],
     },
     {
         statics: {
@@ -47,4 +48,4 @@ function getCateModel(conn) {
     return conn.model('Categories', categorySchema);
 }
 
-module.exports = { schema: categorySchema, model: getCateModel };
+module.exports = { CategoryModel: getCateModel };

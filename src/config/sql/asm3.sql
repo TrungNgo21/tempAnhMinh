@@ -189,27 +189,17 @@ begin
 end; //
 delimiter ;
 
-insert into product values
-                        ('shoes', 2),
-                        ('lotion', 3),
-                        ('egg', 1),
-                        ('necklace', 3),
-                        ('screen', 5),
-                        ('teddy', 1),
-                        ('key', 1);
 
 insert into Warehouse (name, address, city, province, volume) values
 ('Peter', '17', 'Tan Binh', 'TPHCM', 10000),
 ('Sans', '161', 'Thu Duc', 'TPHCM', 28200),
 ('Michael', '82', 'Thanh Xuan', 'Ha Noi', 15600);
-
+#
 insert into warehouse_inventory (warehouseID, productID, quantity) values
-(2, 'shoes', 1500),
-(1, 'key', 5600),
-(3, 'lotion', 2452),
-(3, 'egg', 2200),
-(1, 'screen', 300),
-(3, 'necklace', 560),
-(2, 'teddy', 15961);
+(2, '64f867c079ea0f06a1dc39da', 100),
+(1, '64f867c079ea0f06a1dc39da', 200),
+(3, '64f867c079ea0f06a1dc39ea', 50),
+(1, '64f867c079ea0f06a1dc39ea', 50)
+
 
 

@@ -1,6 +1,6 @@
-const getMySqlConn = require('../../config/sql/Connector');
-const { MongoProductDTO, MySqlUpdateProductDTO, TransferDTO, UpdateInventoryDTO } = require('../DTO/ProductDTO');
-const { UpdateWarehouseDTO } = require('../DTO/WarehouseDTO');
+const getMySqlConn = require('../config/sql/Connector');
+const { MongoProductDTO, MySqlUpdateProductDTO, TransferDTO, UpdateInventoryDTO } = require('../DTO/Product');
+const { UpdateWarehouseDTO } = require('../DTO/Warehouse');
 
 const TYPE = {
     SELECT: true,
@@ -17,7 +17,7 @@ const CHOICE = {
     DELETE_WH: 6,
 };
 
-async function createProduct(user, createProductDTO) {
+async function insertProduct(user, createProductDTO) {
     try {
         const result = await query_wrapper(
             user,
@@ -57,7 +57,7 @@ async function transferInvent(user, transferDTO) {
     }
 }
 
-async function createWarehouse(user, CreateWhDTO) {
+async function insertWarehouse(user, CreateWhDTO) {
     try {
         const result = await query_wrapper(
             user,
@@ -110,8 +110,20 @@ async function updateInventory(user, updateInventoryDTO) {
 
 async function deleteWarehouse(user, deleteWhDTO) {
     try {
-        const result = await query_wrapper(user, `delete from warehouse where id = ${deleteWhDTO.getId()}`);
+        await query_wrapper(user, `delete from warehouse where id = ${deleteWhDTO.getId()}`);
         return { err: false, message: 'delete warehouse success' };
+    } catch (e) {
+        return { err: true, message: e.message };
+    }
+}
+
+async function getAvailableProduct(user) {
+    try {
+        const result = await query_wrapper(
+            user,
+            `select productId from warehouse_inventory where quantity > 0 group by productId`
+        );
+        return { err: false, message: result };
     } catch (e) {
         return { err: true, message: e.message };
     }
@@ -128,6 +140,17 @@ async function query_wrapper(user, sql) {
         await conn.end();
     }
 }
+
+module.exports = {
+    insertWareHouseMySql: insertWarehouse,
+    updateWareHouseMySql: updateWarehouse,
+    deleteWarehouseMySql: deleteWarehouse,
+    insertProductMySql: insertProduct,
+    updateProductMySql: updateProduct,
+    updateInventoryMySql: updateInventory,
+    transferInventMySql: transferInvent,
+    getAvailableProductMySql: getAvailableProduct,
+};
 
 // async function test(user, aDTO, choice) {
 //     switch (choice) {

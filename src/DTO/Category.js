@@ -1,7 +1,8 @@
 const { ObjectId } = require('mongodb');
 
 class ShowCateDTO {
-    constructor(name, parentId, attribute, parentAttribute) {
+    constructor(id, name, parentId, attribute, parentAttribute) {
+        this.id = id;
         this.name = name;
         this.parentId = parentId;
 
@@ -35,16 +36,17 @@ class ShowCateDTO {
     }
 }
 
-class UpdateCateDTO {
+class InsertCateDTO {
     constructor(name, parentId, attribute) {
         this.name = name;
         if (parentId != null) {
-            this.parentId = new ObjectId(parentId);
+            this.parentId = parentId;
         } else {
             this.parentId = parentId;
         }
 
-        this.attribute = this._copyAttribute(attribute);
+        if (attribute != null) this.attribute = this._copyAttribute(attribute);
+        else this.attribute = null;
     }
 
     getName() {
@@ -59,18 +61,6 @@ class UpdateCateDTO {
         return this.attribute;
     }
 
-    setName(name) {
-        this.name = name;
-    }
-
-    setParentId(parentId) {
-        this.parentId = parentId;
-    }
-
-    setAttribute(attribute) {
-        this.attribute = this._copyAttribute(attribute);
-    }
-
     _copyAttribute(attribute) {
         const temp = [];
         attribute.forEach((e) => {
@@ -80,4 +70,15 @@ class UpdateCateDTO {
     }
 }
 
-module.exports = { ShowCateDTO: ShowCateDTO, UpdateCateDTO: UpdateCateDTO };
+class UpdateCateDTO extends InsertCateDTO {
+    constructor(id, name, parentId, attribute) {
+        super(name, parentId, attribute);
+        this.id = id;
+    }
+
+    getId() {
+        return this.id;
+    }
+}
+
+module.exports = { ShowCateDTO: ShowCateDTO, InsertCateDTO: InsertCateDTO, UpdateCateDTO: UpdateCateDTO };
