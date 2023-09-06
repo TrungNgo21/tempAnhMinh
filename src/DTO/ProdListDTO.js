@@ -8,7 +8,11 @@ class EcomProdList {
                 name: item.name,
                 brand: item.brand,
                 price: item.price,
-                source: 'Warehouse A',
+                category: item.category.name,
+                parentCate: (() => {
+                    if (item.category.parentCate != null) return item.category.parentCate.name;
+                    else return null;
+                })(),
             });
         }
     }

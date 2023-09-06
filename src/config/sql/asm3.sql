@@ -191,15 +191,12 @@ delimiter ;
 
 
 insert into Warehouse (name, address, city, province, volume) values
-('Peter', '17', 'Tan Binh', 'TPHCM', 10000),
-('Sans', '161', 'Thu Duc', 'TPHCM', 28200),
-('Michael', '82', 'Thanh Xuan', 'Ha Noi', 15600);
+('warehose 1', '17', 'Tan Binh', 'TPHCM', 10000),
+('warehouse 2', '161', 'Thu Duc', 'TPHCM', 28200),
+('warehouse 3', '82', 'Thanh Xuan', 'Ha Noi', 15600);
 #
 insert into warehouse_inventory (warehouseID, productID, quantity) values
-(2, '64f867c079ea0f06a1dc39da', 100),
-(1, '64f867c079ea0f06a1dc39da', 200),
-(3, '64f867c079ea0f06a1dc39ea', 50),
-(1, '64f867c079ea0f06a1dc39ea', 50)
-
-
-
+(7, '64f8d9710d4306dcedff1ba9', 100),
+(8, '64f8d9710d4306dcedff1ba9', 200),
+(8, '64f8d9710d4306dcedff1bb0', 50),
+(9, '64f8d9710d4306dcedff1bb0', 50)
