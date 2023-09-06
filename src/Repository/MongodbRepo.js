@@ -14,29 +14,11 @@ async function insertCategory(user, insertCateDTO) {
         const category = new conn.cate({
             _id: new mongoose.Types.ObjectId(),
             name: insertCateDTO.getName(),
-            parentId: pId,
+            parentCate: pId,
             attribute: insertCateDTO.getAttribute(),
         });
-        if (insertCateDTO.getParentId() != null) {
-            console.log(insertCateDTO.getParentId().toString());
-            console.log(category.parentId.toString());
-        }
 
         await category.save();
-
-        // const result = await conn.cate
-        //     .findOneAndUpdate(
-        //         { name: insertCateDTO.getName(), parentId: insertCateDTO.getParentId() },
-        //         {
-        //             name: insertCateDTO.getName(),
-        //             parentId: insertCateDTO.getParentId(),
-        //             attribute: insertCateDTO.getAttribute(),
-        //         },
-        //         { upsert: true, new: true }
-        //     )
-        //     .lean()
-        //     .exec();
-
         return { message: category._id, err: false };
     } catch (e) {
         return { err: true, message: e.message };
@@ -57,7 +39,7 @@ async function updateCategory(user, updateCateDTO) {
                 { _id: updateCateDTO.getId() },
                 {
                     name: updateCateDTO.getName(),
-                    parentId: updateCateDTO.getParentId(),
+                    parentCate: updateCateDTO.getParentId(),
                     attribute: updateCateDTO.getAttribute(),
                 },
                 { upsert: true, new: true }
@@ -106,15 +88,27 @@ async function getAllCate(user) {
 
 async function getAllProduct(user, listId) {
     const conn = await getMongoConn(user);
+    const popObject = {
+        path: 'category',
+        model: conn.cate,
+        options: { sort: { position: -1 } },
+        select: '_id name',
+        populate: {
+            path: 'parentCate',
+            model: conn.cate,
+            select: '_id name',
+        },
+    };
     try {
         const result = await conn.product
             .find({ _id: { $in: listId } })
+            .populate(popObject)
             .sort({ name: 1 })
             .lean()
             .exec();
         return { err: false, message: result };
     } catch (e) {
-        return { err: true, message: e.message };
+        throw Error(e.message);
     } finally {
         await conn.conn.close();
     }
@@ -127,29 +121,20 @@ async function insertProduct(user, insertProdDTO) {
         const valid = await conn.product.validateInsert(insertProdDTO, conn.cate);
         if (!valid) return { err: true, message: 'product attribute not match with category' };
 
-        const result = await conn.product
-            .findOneAndUpdate(
-                {
-                    name: insertProdDTO.getName(),
-                    brand: insertProdDTO.getBrand(),
-                    category: insertProdDTO.getCategory(),
-                },
-                {
-                    name: insertProdDTO.getName(),
-                    brand: insertProdDTO.getBrand(),
-                    price: insertProdDTO.getPrice(),
-                    dimension: insertProdDTO.getDimension(),
-                    color: insertProdDTO.getColor(),
-                    category: insertProdDTO.getCategory(),
-                    attribute: insertProdDTO.getAttribute(),
-                    pAttribute: insertProdDTO.getParentAttribute(),
-                },
-                { upsert: true, new: true }
-            )
-            .lean()
-            .exec();
+        const product = new conn.product({
+            _id: new mongoose.Types.ObjectId(),
+            name: insertProdDTO.getName(),
+            brand: insertProdDTO.getBrand(),
+            price: insertProdDTO.getPrice(),
+            dimension: insertProdDTO.getDimension(),
+            color: insertProdDTO.getColor(),
+            category: new mongoose.Types.ObjectId(insertProdDTO.getCategory()),
+            attribute: insertProdDTO.getAttribute(),
+            pAttribute: insertProdDTO.getParentAttribute(),
+        });
 
-        return { message: result._id.toString(), err: false };
+        await product.save();
+        return { err: false, message: product._id };
     } catch (e) {
         return { err: true, message: e.message };
     } finally {

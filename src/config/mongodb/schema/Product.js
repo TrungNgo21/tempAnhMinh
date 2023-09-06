@@ -17,18 +17,20 @@ const productSchema = new Schema(
     },
     {
         statics: {
-            async validateInsert(insertProductDTO, category) {
-                let result = await category
-                    .find({ _id: insertProductDTO.getCategory() }, 'parentId attribute')
-                    .lean()
-                    .exec();
+            async validateInsert(insertProductDTO, cate) {
+                const popObject = {
+                    path: 'parentCate',
+                    model: cate,
+                    select: 'attribute',
+                };
+
+                let result = await cate.find({ _id: insertProductDTO.getCategory() }).populate(popObject).lean().exec();
 
                 const attribute = result[0].attribute;
 
                 let pAttribute;
-                if (result[0].parentId != null) {
-                    result = await category.find({ _id: result[0].parentId }, 'attribute').lean().exec();
-                    pAttribute = result[0].attribute;
+                if (result[0].parentCate != null) {
+                    pAttribute = result[0].parentCate.attribute;
                 } else pAttribute = [];
 
                 if (

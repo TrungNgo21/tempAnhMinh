@@ -3,9 +3,8 @@ const { mongoose, Schema } = require('mongoose');
 const categorySchema = new Schema(
     {
         name: String,
-        parentId: { type: Schema.Types.ObjectId, ref: 'categories' },
+        parentCate: { type: Schema.Types.ObjectId, ref: 'categories' },
         attribute: [{}],
-        products: [{ type: Schema.Types.ObjectId, ref: 'products' }],
     },
     {
         statics: {
@@ -13,7 +12,7 @@ const categorySchema = new Schema(
                 const result = await this.findById(id).lean().exec();
                 if (result == null) return { valid: false, id: null };
 
-                const isParent = await this.countDocuments({ parentId: id }).lean().exec();
+                const isParent = await this.countDocuments({ parentCate: id }).lean().exec();
                 if (isParent != 0) return { valid: false, id: id };
 
                 const prodCount = await product.countDocuments({ category: result._id }).lean().exec();
@@ -21,7 +20,9 @@ const categorySchema = new Schema(
                 return { valid: prodCount == 0, id: result._id };
             },
             async validateUpdate(cateDTO, product) {
-                const result = await this.find({ name: cateDTO.name, parentId: cateDTO.parentId }, '_id').lean().exec();
+                const result = await this.find({ name: cateDTO.name, parentCate: cateDTO.parentId }, '_id')
+                    .lean()
+                    .exec();
 
                 if (result.length == 0) return { valid: true, id: null };
 
