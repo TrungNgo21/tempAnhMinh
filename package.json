@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev_mongo": "node src/config/MongodbCollectionConfig.js",
-    "dev_warehouse": "node src/WMS/Controller/WMSController.js",
+    "dev": "node src/WMS/Controller/WMSController.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -20,8 +20,7 @@
     "lodash": "^4.17.21",
     "mongodb": "^5.8.1",
     "mongoose": "^7.4.5",
-    "mysql2": "^3.6.0",
-    "path": "^0.12.7"
+    "mysql2": "^3.6.0"
   },
   "devDependencies": {
     "prettier": "3.0.2"

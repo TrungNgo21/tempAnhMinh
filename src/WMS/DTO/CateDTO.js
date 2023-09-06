@@ -1,6 +1,41 @@
 const { ObjectId } = require('mongodb');
 
-class updateCateDTO {
+class ShowCateDTO {
+    constructor(name, parentId, attribute, parentAttribute) {
+        this.name = name;
+        this.parentId = parentId;
+
+        this.attribute = this._copyAttribute(attribute);
+
+        this.parentAttribute = this._copyAttribute(parentAttribute);
+    }
+
+    _copyAttribute(attribute) {
+        const temp = [];
+        attribute.forEach((e) => {
+            temp.push({ name: e.name });
+        });
+        return temp;
+    }
+
+    getName() {
+        return this.name;
+    }
+
+    getParentId() {
+        return this.parentId;
+    }
+
+    getAttribute() {
+        return this.attribute;
+    }
+
+    getParentAttribute() {
+        return this.parentAttribute;
+    }
+}
+
+class UpdateCateDTO {
     constructor(name, parentId, attribute) {
         this.name = name;
         if (parentId != null) {
@@ -45,4 +80,4 @@ class updateCateDTO {
     }
 }
 
-module.exports = updateCateDTO;
+module.exports = { ShowCateDTO: ShowCateDTO, UpdateCateDTO: UpdateCateDTO };
