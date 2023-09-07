@@ -5,15 +5,15 @@ const cred = {
     whadmin: 'CnSNL2Dw50Hd9gui',
     staff: 'vVlOlqte0giTh1IQ',
     customer: 'vVlOlqte0giTh1IQ',
-    root: 'root123',
+    root: 'password',
 };
 async function getMySqlConn(user) {
-    return await mysql.createConnection({
-        user: user,
-        password1: cred[user],
-        database: 'public',
-        Promise: bluebird,
-    });
+	return await mysql.createConnection({
+		user: user,
+		password1: cred[user],
+		database: 'public',
+		Promise: bluebird,
+	});
 }
 
 module.exports = getMySqlConn;
