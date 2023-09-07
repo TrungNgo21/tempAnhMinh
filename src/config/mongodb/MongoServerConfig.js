@@ -16,7 +16,7 @@ db.createUser({
     roles: [
         { role: 'userAdminAnyDatabase', db: 'admin' },
         { role: 'readWriteAnyDatabase', db: 'admin' },
-        { role: 'root' },
+        { role: 'root', db : 'admin'},
     ],
 });
 

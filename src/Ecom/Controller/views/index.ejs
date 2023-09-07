@@ -16,7 +16,6 @@
             display: inline-block;
             width: 19%;
             margin: 1%;
-            text-align: center;
             text-decoration: none;
             border: 1px solid #ccc;
             padding: 10px;
@@ -77,9 +76,7 @@
 
   <section class="section-products" style="padding: 0;">
 		<div class="container">
-				<div class="row justify-content-center text-center">
 
-				</div>
 				<div id = "Display-Item">
 				</div>
 		</div>
@@ -121,7 +118,6 @@ async function sendPostRequest(url, req) {
             },
             body: JSON.stringify(req),
         };
-
         const response = await fetch(url, requestOptions);
         if (!response.ok) {
             throw new Error('Error sending POST request');
@@ -146,26 +142,32 @@ async function renderDisplay() {
             rowDiv.className = 'product-row';
             productListDiv.appendChild(rowDiv)
         }
-
+        
         const productInfo = document.createElement('div')
-        const productName = document.createElement('h3')
+        const productName = document.createElement('h5')
+        productInfo.className = "productInfo"
+        productInfo.style.paddingLeft = "10px"
         productName.innerText = `${product.name}`
         productInfo.appendChild(productName)
         const productImg = document.createElement('div');
         const img = document.createElement('img');
         img.src = `${product.image}`;
-        img.style = 'width: 80%';
+        productImg.className = "productImg"
+        img.style = 'width:100%';
         productImg.appendChild(img)
 
         const productLink = document.createElement('a');
         productLink.appendChild(productImg)
         productLink.appendChild(productInfo)
+        productLink.id = `${product.id}`
         productLink.href = `javascript:void(0);`;
         productLink.className = 'product-link';
 
         productLink.addEventListener('click', async () => {
-            const res = await sendPostRequest(`/productDetail`, {productId: product.id})
-            console.log(await res.json())
+            const res = await sendPostRequest(`/productDetail`, {productId: productLink.id})
+            // console.log(JSON.stringify({productId: productLink.id}))
+            // console.log(await res.json())
+            window.location.replace('http://localhost:5501/product_detail')
         });
         rowDiv.appendChild(productLink);
     })

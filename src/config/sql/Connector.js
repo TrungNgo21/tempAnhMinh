@@ -5,7 +5,7 @@ const cred = {
     whadmin: 'CnSNL2Dw50Hd9gui',
     staff: 'vVlOlqte0giTh1IQ',
     customer: 'vVlOlqte0giTh1IQ',
-    root: 'password',
+    root: 'root123',
 };
 async function getMySqlConn(user) {
     return await mysql.createConnection({

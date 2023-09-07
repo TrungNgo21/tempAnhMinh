@@ -43,59 +43,59 @@ async function insertProductService(mapObject) {
 
 module.exports = { getAvailableProductService: getAvailableProductService };
 
-let pCateId;
-let cateId;
-Promise.resolve()
-    .then(async () => {
-        const cate = new InsertCateDTO('test cate 1', null, [{ name: 'attribute 1' }, { name: 'attribute 2' }]);
-        let result = await insertCategoryMongo('whadmin', cate);
-        pCateId = result.message;
-    })
-    .then(async () => {
-        const cate = new InsertCateDTO('test cate 2', pCateId, [{ name: 'attribute 3' }, { name: 'attribute 4' }]);
-        let result = await insertCategoryMongo('whadmin', cate);
-        cateId = result.message;
-    })
-    .then(async () => {
-        const test = {
-            name: 'test product 1',
-            brand: 'test brand 1',
-            price: 10000,
-            dimension: {
-                width: 3,
-                height: 1,
-                length: 1,
-            },
-            color: 'blue',
-            category: pCateId,
-            attribute: [
-                { name: 'attribute 1', value: 'test attribute' },
-                { name: 'attribute 2', value: 'test child attribute' },
-            ],
-            pAttribute: [],
-        };
-        console.log(await insertProductService(test));
-    })
-    .then(async () => {
-        const test = {
-            name: 'test product 2',
-            brand: 'test brand 2',
-            price: 20000,
-            dimension: {
-                width: 1,
-                height: 2,
-                length: 2,
-            },
-            color: 'red',
-            category: cateId,
-            attribute: [
-                { name: 'attribute 3', value: 'test child attribute' },
-                { name: 'attribute 4', value: 'test other child attribute' },
-            ],
-            pAttribute: [
-                { name: 'attribute 1', value: 'test parent attribute' },
-                { name: 'attribute 2', value: 'test other parent attribute' },
-            ],
-        };
-        console.log(await insertProductService(test));
-    });
+// let pCateId;
+// let cateId;
+// Promise.resolve()
+//     .then(async () => {
+//         const cate = new InsertCateDTO('test cate 1', null, [{ name: 'attribute 1' }, { name: 'attribute 2' }]);
+//         let result = await insertCategoryMongo('whadmin', cate);
+//         pCateId = result.message;
+//     })
+//     .then(async () => {
+//         const cate = new InsertCateDTO('test cate 2', pCateId, [{ name: 'attribute 3' }, { name: 'attribute 4' }]);
+//         let result = await insertCategoryMongo('whadmin', cate);
+//         cateId = result.message;
+//     })
+//     .then(async () => {
+//         const test = {
+//             name: 'test product 1',
+//             brand: 'test brand 1',
+//             price: 10000,
+//             dimension: {
+//                 width: 3,
+//                 height: 1,
+//                 length: 1,
+//             },
+//             color: 'blue',
+//             category: pCateId,
+//             attribute: [
+//                 { name: 'attribute 1', value: 'test attribute' },
+//                 { name: 'attribute 2', value: 'test child attribute' },
+//             ],
+//             pAttribute: [],
+//         };
+//         console.log(await insertProductService(test));
+//     })
+//     .then(async () => {
+//         const test = {
+//             name: 'test product 2',
+//             brand: 'test brand 2',
+//             price: 20000,
+//             dimension: {
+//                 width: 1,
+//                 height: 2,
+//                 length: 2,
+//             },
+//             color: 'red',
+//             category: cateId,
+//             attribute: [
+//                 { name: 'attribute 3', value: 'test child attribute' },
+//                 { name: 'attribute 4', value: 'test other child attribute' },
+//             ],
+//             pAttribute: [
+//                 { name: 'attribute 1', value: 'test parent attribute' },
+//                 { name: 'attribute 2', value: 'test other parent attribute' },
+//             ],
+//         };
+//         console.log(await insertProductService(test));
+//     });
