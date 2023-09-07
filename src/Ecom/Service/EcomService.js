@@ -1,6 +1,12 @@
-const { getAvailableProductMySql, getProductInventory } = require('../../Repository/MySqlRepo');
+const {
+	getAvailableProductMySql,
+	getProductInventory,
+} = require('../../Repository/MySqlRepo');
 const { AvailableProdDTO } = require('../../DTO/Product');
-const { getAllProductMongo, getProduct } = require('../../Repository/MongodbRepo');
+const {
+	getAllProductMongo,
+	getProduct,
+} = require('../../Repository/MongodbRepo');
 const { ECOMProdList, ProductDetail } = require('../ReturnDTO/ReturnDTO');
 
 async function getAvailableProductService() {
@@ -9,7 +15,10 @@ async function getAvailableProductService() {
 
 		const productIds = new AvailableProdDTO(ids.message);
 
-		const result = await getAllProductMongo('customer', productIds.getIds());
+		const result = await getAllProductMongo(
+			'customer',
+			productIds.getIds()
+		);
 		const returnDTO = new ECOMProdList(result.message);
 
 		return { err: false, message: returnDTO.getList() };
@@ -18,12 +27,15 @@ async function getAvailableProductService() {
 	}
 }
 
-async function getProductDetailService(id) {
+async function getProductDetailService(mapObject) {
 	try {
-		const mongoReturn = await getProduct('customer', id);
-		const mysqlReturn = await getProductInventory('root', id);
+		const mongoReturn = await getProduct('customer', mapObject.id);
+		const mysqlReturn = await getProductInventory('root', mapObject.id);
 		if (!mongoReturn.err && !mysqlReturn.err) {
-			const returnDTO = new ProductDetail(mongoReturn.message, mysqlReturn.message);
+			const returnDTO = new ProductDetail(
+				mongoReturn.message,
+				mysqlReturn.message
+			);
 			return { err: false, message: returnDTO.getProductDetail() };
 		} else if (mongoReturn.err) {
 			return { err: true, message: mongoReturn.message };
