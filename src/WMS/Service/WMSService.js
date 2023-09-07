@@ -1,0 +1,240 @@
+const { InsertProductDTO, UpdateProductDTO } = require('../../DTO/Product');
+const {
+	insertProductMongo,
+	insertCategoryMongo,
+	updateCategoryMongo,
+	updateProductMongo,
+	deleteCategoryMongo,
+	getAllProductMongo,
+} = require('../../Repository/MongodbRepo');
+const {
+	insertProductMySql,
+	insertWareHouseMySql,
+	updateWareHouseMySql,
+	deleteWarehouseMySql,
+	updateProductMySql,
+	getAllWarehouse,
+	updateInventoryMySql,
+} = require('../../Repository/MySqlRepo');
+const {
+	InsertWarehouseDTO,
+	UpdateWarehouseDTO,
+	DeleteWarehouseDTO,
+} = require('../../DTO/Warehouse');
+const {
+	InsertCateDTO,
+	UpdateCateDTO,
+	DeleteCateDTO,
+} = require('../../DTO/Category');
+const { UpdateInventoryDTO } = require('../../DTO/Inventory');
+
+async function insertProductService(user, mapObject) {
+	try {
+		const insertDTO = new InsertProductDTO(
+			mapObject.name,
+			mapObject.brand,
+			mapObject.price,
+			mapObject.dimension,
+			mapObject.color,
+			mapObject.category,
+			mapObject.attribute,
+			mapObject.pAttribute
+		);
+		const mongoResult = await insertProductMongo(user, insertDTO);
+
+		if (mongoResult.err) {
+			return { err: true, message: mongoResult.message };
+		}
+
+		const id = mongoResult.message.toString();
+
+		const sqlResult = await insertProductMySql(
+			'root',
+			insertDTO.getInsertMySqlDTO(id)
+		);
+		if (sqlResult.err) {
+			return { err: true, message: sqlResult.message };
+		}
+
+		return { err: false, message: id };
+	} catch (e) {
+		return { err: true, message: e.message };
+	}
+}
+
+async function updateProductDTO(user, mapObject) {
+	try {
+		const updateDTO = new UpdateProductDTO(
+			mapObject.id,
+			mapObject.name,
+			mapObject.brand,
+			mapObject.price,
+			mapObject.dimension,
+			mapObject.color,
+			mapObject.category,
+			mapObject.attribute,
+			mapObject.pAttribute
+		);
+		const sqlDTO = await updateProductMySql('root', updateDTO);
+		if (sqlDTO.err) {
+			return { err: true, message: sqlDTO.message };
+		}
+
+		const mongoDTO = await updateProductMongo(user, updateDTO);
+		if (mongoDTO.err) {
+			return { err: true, message: mongoDTO.message };
+		}
+		return { err: false, message: mongoDTO.id };
+	} catch (e) {
+		return { err: true, message: e.message };
+	}
+}
+
+async function createPO(user, mapObject) {
+	try {
+		const updateDTO = new UpdateInventoryDTO(mapObject.id, mapObject.qty);
+		const sqlReturn = await updateInventoryMySql(updateDTO);
+		return { err: sqlReturn.err, message: sqlReturn.message };
+	} catch (e) {
+		return { err: true, message: e.message };
+	}
+}
+
+async function getAllProduct(user) {
+	try {
+		const mongoReturn = await getAllProductMongo(user, []);
+		if (mongoReturn.err) {
+			return { err: true, message: mongoReturn.message };
+		}
+		//need to get quantity from sql server
+		return { err: false, message: mongoReturn.message };
+	} catch (e) {
+		return { err: true, message: e.message };
+	}
+}
+
+async function insertWarehouseService(user, mapObject) {
+	try {
+		const insertDTO = new InsertWarehouseDTO(
+			mapObject.name,
+			mapObject.address,
+			mapObject.city,
+			mapObject.province,
+			mapObject.volume
+		);
+		const sqlReturn = await insertWareHouseMySql('root', insertDTO);
+		if (sqlReturn.err) {
+			return { err: true, message: sqlReturn.message };
+		}
+		return { err: false, message: sqlReturn.id };
+	} catch (e) {
+		return { err: true, message: e.message };
+	}
+}
+
+async function updateWarehouseService(user, mapObject) {
+	try {
+		const updateDTO = new UpdateWarehouseDTO(
+			mapObject.id,
+			mapObject.name,
+			mapObject.address,
+			mapObject.city,
+			mapObject.province,
+			mapObject.volume
+		);
+		const sqlReturn = await updateWareHouseMySql('root', updateDTO);
+		if (sqlReturn.err) {
+			return { err: true, message: sqlReturn.message };
+		}
+		return { err: false, message: sqlReturn.id };
+	} catch (e) {
+		return { err: true, message: e.message };
+	}
+}
+
+async function deleteWarehouseService(user, mapObject) {
+	try {
+		const deleteDTO = new DeleteWarehouseDTO(mapObject.id);
+		const sqlReturn = await deleteWarehouseMySql(user, deleteDTO);
+		if (sqlReturn.err) {
+			return { err: true, message: sqlReturn.message };
+		}
+		return { err: false, message: sqlReturn.message };
+	} catch (e) {
+		return { err: true, message: e.message };
+	}
+}
+
+async function getAllWarehouseService(user) {
+	try {
+		const sqlReturn = await getAllWarehouse(user);
+		if (sqlReturn.err) {
+			return { err: true, message: sqlReturn.message };
+		}
+		return { err: false, message: sqlReturn.message };
+	} catch (e) {
+		return { err: true, message: e.message };
+	}
+}
+
+async function insertCategoryService(user, mapObject) {
+	try {
+		const insertDTO = new InsertCateDTO(
+			mapObject.name,
+			mapObject.parentId,
+			mapObject.attribute
+		);
+		const mongoReturn = await insertCategoryMongo(user, insertDTO);
+		if (mongoReturn.err) {
+			return { err: true, message: mongoReturn.message };
+		}
+		return { err: false, message: mongoReturn.message };
+	} catch (e) {
+		return { err: true, message: e.message };
+	}
+}
+
+async function updateCategoryService(user, mapObject) {
+	try {
+		const updateDTO = new UpdateCateDTO(
+			mapObject.id,
+			mapObject.name,
+			mapObject.parentId,
+			mapObject.attribute
+		);
+		const mongoReturn = await updateCategoryMongo(user, updateDTO);
+		if (mongoReturn.err) {
+			return { err: true, message: mongoReturn.message };
+		}
+		return { err: false, message: mongoReturn.id };
+	} catch (e) {
+		return { err: true, message: e.message };
+	}
+}
+
+async function deleteCategoryService(user, mapObject) {
+	try {
+		const deleteDTO = new DeleteCateDTO(mapObject.id);
+		const mongoReturn = await deleteCategoryMongo(user, deleteDTO);
+		if (mongoReturn.err) {
+			return { err: true, message: mongoReturn.message };
+		}
+		return { err: false, message: mongoReturn.message };
+	} catch (e) {
+		return { err: true, message: e.message };
+	}
+}
+
+module.exports = {
+	insertProductService: insertProductService,
+	updateProductDTO: updateProductDTO,
+	createPO: createPO,
+	getAllProduct: getAllProduct,
+	insertWarehouseService: insertWarehouseService,
+	updateWarehouseService: updateWarehouseService,
+	deleteWarehouseService: deleteWarehouseService,
+	getAllWarehouseService: getAllWarehouseService,
+	insertCategoryService: insertCategoryService,
+	updateCategoryService: updateCategoryService,
+	deleteCategoryService: deleteCategoryService,
+};

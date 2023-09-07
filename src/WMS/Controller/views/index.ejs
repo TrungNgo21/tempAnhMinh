@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div class ="nav-bar">
+    <h1>Shop name</h1>
+    <div class = "filter-section">
+      <div class="breadcrumb" id="breadcrumb"> 
+        <p>Home</p>
+      </div>
+      <form action="/", method="get" id = "Search" name = "Search" onsubmit="filterListing()">    
+        <input type="text" id="searched_name" name = "searched_name" placeholder="Search for names.."> 
+        &emsp;
+        <label for="category">Choose a category:</label>
+        <select id="category" name="category">
+          <option disabled selected></option>
+        </select>
+        <input type="submit">
+      </form>
+    </div>
+
+    <div class = "Display-Item" id ="Display-Item">
+      
+    </div>
+  </div>
+  </div>
+</body>
+
+
+<script>
+  const category = ["Electronic", "Food", "Skincare","Clothing"]
+  for (let i = 0; i < category.length; i++) {
+  document.getElementById("category").innerHTML += "<option value ='" + category[i] + "'>"+ category[i]+"</option>";
+}
+
+  const item = [
+  {image: "jpg",
+  name: "Egg",
+  price: 90,
+  source: "Warehouse A",
+  item_category: "Food"},
+
+  {image: "jpg2",
+  name: "Mouse",
+  price: 180,
+  source: "Warehouse B",
+  item_category: "Electronic"}
+];
+
+
+
+for (let i = 0; i < 10; i++) {
+  const myArray = Object.values(item[i]);
+  
+  document.getElementById("Display-Item").innerHTML += "<div class = 'item'> <hr><ul><li><a href='product_detail.html'>"
+                                                    + myArray[0] +"</a></li><li>"
+                                                    +myArray[1]+"</li><li>"
+                                                    +myArray[2]+"</li><li>"
+                                                    +myArray[3]+"</li></ul> </div>";
+}
+
+
+</script>
+</html>
+
