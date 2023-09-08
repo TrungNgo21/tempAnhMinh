@@ -4,9 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start-ecom": "cd src/Ecom/Controller/ && node CustomerController.js",
+    "start-wms": "cd src/WMS/Controller/ && node WMSController.js",
     "init": "node src/config/initDemoConfig.js",
     "dev": "node src/WMS/Controller/WMSController.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "concurrently \"npm run init\" \"npm run start-ecom\" \"npm run start-wms\"",
+    "stop": "pkill -f 'node WMSController.js' && pkill -f 'node CustomerController.js"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +30,7 @@
   },
   "devDependencies": {
     "eslint-config-prettier": "^9.0.0",
-    "prettier": "3.0.2"
+    "prettier": "3.0.2",
+    "concurrently": "^6.2.2"
   }
 }
