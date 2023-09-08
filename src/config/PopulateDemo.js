@@ -23,7 +23,7 @@ async function main() {
 		transferStatus = await transferProduct(products, warehouses);
 
 		console.log(
-			`Warehouse added: ${warehouses}\nCategories added: ${categories}\nProduct added: ${products}\nPO completed: ${poStatus.length}\nTransfer completed: ${transferStatus.length}`
+			`Warehouse added: ${warehouses}\nCategories added: ${categories}\nProduct added: ${products}\nPO completed: ${poStatus}\nTransfer completed: ${transferStatus}`
 		);
 	} catch (e) {
 		console.error('Error occured', e);
@@ -174,7 +174,7 @@ async function initSQL() {
 	let conn;
 	try {
 		conn = await getMySqlConn('root');
-		const sqlScript = fs.readFileSync('./sql/asm3.sql', 'utf-8');
+		const sqlScript = fs.readFileSync(__dirname + '/sql/asm3.sql', 'utf-8');
 
 		const sqls = sqlScript
 			.split(/--.*(?:\r\n|\r|\n|$)/)

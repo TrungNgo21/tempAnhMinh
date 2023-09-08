@@ -122,36 +122,6 @@ create index warehouse_search_index on warehouse (name, address, city, province)
 -- Create index
 create index inventory_search_index on warehouse_inventory (warehouseID, productID);
 
--- Grant permission for role
-grant select on public.product to warehouse_admin, warehouse_staff, customer;
-
--- Grant permission for role
-grant select, insert, update, delete on public.warehouse to warehouse_admin;
-
--- Grant permission for role
-grant select, insert, update on public.warehouse_inventory to warehouse_staff;
-
--- Grant permission for role
-grant select, insert, update on public.product to warehouse_staff;
-
--- Grant permission for role
-grant select on public.warehouse_inventory to customer;
-
--- Grant permission for role
-grant select on public.warehouse to customer;
-
--- Grant permission for role
-grant select on public.product to customer;
-
--- Set role as default for user
-alter user 'whadmin'@'localhost' default role warehouse_admin;
-
--- Set role as default for user
-alter user 'staff'@'localhost' default role warehouse_staff;
-
--- Set role as default for user
-alter user 'customer'@'localhost' default role customer;
-
 -- Define delimiter
 -- delimiter //
 
@@ -310,6 +280,42 @@ begin
     end if;
     drop temporary table if exists temp;
 end;
+
+-- Grant permission for role
+grant select on public.product to warehouse_admin, warehouse_staff, customer;
+
+-- Grant permission for role
+grant select, insert, update, delete on public.warehouse to warehouse_admin;
+
+-- Grant permission for role
+grant select, insert, update on public.warehouse_inventory to warehouse_staff;
+
+-- Grant permission for role
+grant select, insert, update on public.product to warehouse_staff;
+
+-- Grant permission for role
+grant execute on procedure public.product_purchase_order to warehouse_staff;
+
+-- Grant permission for role
+grant execute on procedure public.product_transfer to warehouse_staff;
+
+-- Grant permission for role
+grant select on public.warehouse_inventory to customer;
+
+-- Grant permission for role
+grant select on public.warehouse to customer;
+
+-- Grant permission for role
+grant select on public.product to customer;
+
+-- Set role as default for user
+alter user 'whadmin'@'localhost' default role warehouse_admin;
+
+-- Set role as default for user
+alter user 'staff'@'localhost' default role warehouse_staff;
+
+-- Set role as default for user
+alter user 'customer'@'localhost' default role customer;
 
 -- Set delimiter back to default
 -- delimiter ;
