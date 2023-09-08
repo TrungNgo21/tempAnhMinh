@@ -1,4 +1,4 @@
-const getMySqlConn = require('../config/sql/Connector');
+const getMySqlConn = require('../config/sql/connector');
 const {
 	MongoProductDTO,
 	MySqlUpdateProductDTO,
@@ -132,6 +132,7 @@ async function updateWarehouse(user, updateWhDTO) {
 
 async function updateInventory(user, updateInventoryDTO) {
 	try {
+		console.log(updateInventoryDTO);
 		const result = await queryWrapper(
 			user,
 			`call product_purchase_order ('${updateInventoryDTO.getId()}', ${updateInventoryDTO.getQty()})`

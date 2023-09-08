@@ -15,6 +15,7 @@ const {
 	updateProductMySql,
 	getAllWarehouse,
 	updateInventoryMySql,
+	transferInventMySql,
 } = require('../../Repository/MySqlRepo');
 const {
 	InsertWarehouseDTO,
@@ -26,7 +27,7 @@ const {
 	UpdateCateDTO,
 	DeleteCateDTO,
 } = require('../../DTO/Category');
-const { UpdateInventoryDTO } = require('../../DTO/Inventory');
+const { UpdateInventoryDTO, TransferDTO } = require('../../DTO/Inventory');
 
 async function insertProductService(user, mapObject) {
 	try {
@@ -49,7 +50,7 @@ async function insertProductService(user, mapObject) {
 		const id = mongoResult.message.toString();
 
 		const sqlResult = await insertProductMySql(
-			'root',
+			user,
 			insertDTO.getInsertMySqlDTO(id)
 		);
 		if (sqlResult.err) {
@@ -62,7 +63,7 @@ async function insertProductService(user, mapObject) {
 	}
 }
 
-async function updateProductDTO(user, mapObject) {
+async function updateProductService(user, mapObject) {
 	try {
 		const updateDTO = new UpdateProductDTO(
 			mapObject.id,
@@ -75,7 +76,7 @@ async function updateProductDTO(user, mapObject) {
 			mapObject.attribute,
 			mapObject.pAttribute
 		);
-		const sqlDTO = await updateProductMySql('root', updateDTO);
+		const sqlDTO = await updateProductMySql(user, updateDTO);
 		if (sqlDTO.err) {
 			return { err: true, message: sqlDTO.message };
 		}
@@ -90,17 +91,33 @@ async function updateProductDTO(user, mapObject) {
 	}
 }
 
-async function createPO(user, mapObject) {
+async function createPOService(user, mapObject) {
 	try {
 		const updateDTO = new UpdateInventoryDTO(mapObject.id, mapObject.qty);
-		const sqlReturn = await updateInventoryMySql(updateDTO);
+		console.log(updateDTO);
+		const sqlReturn = await updateInventoryMySql(user, updateDTO);
 		return { err: sqlReturn.err, message: sqlReturn.message };
 	} catch (e) {
 		return { err: true, message: e.message };
 	}
 }
 
-async function getAllProduct(user) {
+async function transferInventoryService(user, mapObject) {
+	try {
+		const transferDTO = new TransferDTO(
+			mapObject.id,
+			mapObject.fromWhId,
+			mapObject.toWhId,
+			mapObject.qty
+		);
+		const sqlReturn = await transferInventMySql(user, transferDTO);
+		return { err: sqlReturn.err, message: sqlReturn.message };
+	} catch (e) {
+		return { err: true, message: e.message };
+	}
+}
+
+async function getAllProductService(user) {
 	try {
 		const mongoReturn = await getAllProductMongo(user, []);
 		if (mongoReturn.err) {
@@ -122,7 +139,7 @@ async function insertWarehouseService(user, mapObject) {
 			mapObject.province,
 			mapObject.volume
 		);
-		const sqlReturn = await insertWareHouseMySql('root', insertDTO);
+		const sqlReturn = await insertWareHouseMySql(user, insertDTO);
 		if (sqlReturn.err) {
 			return { err: true, message: sqlReturn.message };
 		}
@@ -142,7 +159,7 @@ async function updateWarehouseService(user, mapObject) {
 			mapObject.province,
 			mapObject.volume
 		);
-		const sqlReturn = await updateWareHouseMySql('root', updateDTO);
+		const sqlReturn = await updateWareHouseMySql(user, updateDTO);
 		if (sqlReturn.err) {
 			return { err: true, message: sqlReturn.message };
 		}
@@ -227,9 +244,10 @@ async function deleteCategoryService(user, mapObject) {
 
 module.exports = {
 	insertProductService: insertProductService,
-	updateProductDTO: updateProductDTO,
-	createPO: createPO,
-	getAllProduct: getAllProduct,
+	updateProductDTOService: updateProductService,
+	createPOService: createPOService,
+	transferInventoryService: transferInventoryService,
+	getAllProductService: getAllProductService,
 	insertWarehouseService: insertWarehouseService,
 	updateWarehouseService: updateWarehouseService,
 	deleteWarehouseService: deleteWarehouseService,

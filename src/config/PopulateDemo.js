@@ -2,53 +2,46 @@ const {
 	insertWarehouseService,
 	insertCategoryService,
 	insertProductService,
-	createPO,
+	createPOService,
+	transferInventoryService,
 } = require('../WMS/Service/WMSService');
-
-const getMySqlConn = require('../config/sql/Connector');
-
+const getMySqlConn = require('./sql/connector');
 let fs = require('fs');
-let readline = require('readline');
 
-let warehouses = [];
-let products = [];
-let categories = [];
-let POStatus = [];
+async function main() {
+	let warehouses = [];
+	let products = [];
+	let categories = [];
+	let poStatus = [];
+	let transferStatus = [];
+	try {
+		await initSQL();
+		warehouses = await populateWarehouse();
+		categories = await populateCategory();
+		products = await populateProduct(categories);
+		poStatus = await populateInventory(products);
+		transferStatus = await transferProduct(products, warehouses);
 
-Promise.resolve()
-	.then(async () => {
-		let myCon = await getMySqlConn('root');
-		let rl = await readline.createInterface({
-			input: fs.createReadStream('../config/sql/asm3.sql'),
-			terminal: false,
-		});
+		console.log(
+			`Warehouse added: ${warehouses}\nCategories added: ${categories}\nProduct added: ${products}\nPO completed: ${poStatus.length}\nTransfer completed: ${transferStatus.length}`
+		);
+	} catch (e) {
+		console.error('Error occured', e);
+	}
+}
 
-		await rl.on('line', function (chunk) {
-			myCon.query(chunk.toString('ascii'), function (err, sets, fields) {
-				if (err) {
-					console.log(err);
-				}
-			});
-		});
-		await rl.on('close', function () {
-			console.log('finished');
-			myCon.end();
-		});
-	})
-	// Insert Warehouse
-	.then(async () => {
-		const result = await insertWarehouseService('whadmin', {
+async function populateWarehouse() {
+	let warehouses = [];
+	try {
+		let result = await insertWarehouseService('whadmin', {
 			name: 'test warehouse 1',
 			address: '123 test address',
 			city: 'test city',
 			province: 'test province',
 			volume: 5000,
 		});
-
 		warehouses.push(result.message);
-	})
-	.then(async () => {
-		const result = await insertWarehouseService('whadmin', {
+		result = await insertWarehouseService('whadmin', {
 			name: 'test warehouse 2',
 			address: '456 test address',
 			city: 'test city 2',
@@ -56,9 +49,7 @@ Promise.resolve()
 			volume: 3000,
 		});
 		warehouses.push(result.message);
-	})
-	.then(async () => {
-		const result = await insertWarehouseService('whadmin', {
+		result = await insertWarehouseService('whadmin', {
 			name: 'test warehouse 3',
 			address: '789 test address',
 			city: 'test city 3',
@@ -66,35 +57,43 @@ Promise.resolve()
 			volume: 2000,
 		});
 		warehouses.push(result.message);
-	})
-	.then(() => console.log(warehouses))
-	.then(async () => {
-		const result = await insertCategoryService('whadmin', {
+		return warehouses;
+	} catch (e) {
+		console.error('Error occured', e);
+	}
+}
+
+async function populateCategory() {
+	let categories = [];
+	try {
+		let result = await insertCategoryService('whadmin', {
 			name: 'test cate 1',
 			parentId: null,
 			attribute: [{ name: 'attribute 1' }],
 		});
 		categories.push(result.message.toString());
-	})
-	.then(async () => {
-		const result = await insertCategoryService('whadmin', {
+		result = await insertCategoryService('whadmin', {
 			name: 'test cate 2',
 			parentId: null,
 			attribute: [{ name: 'attribute 2' }, { name: 'attribute 3' }],
 		});
 		categories.push(result.message.toString());
-	})
-	.then(async () => {
-		const result = await insertCategoryService('whadmin', {
+		result = await insertCategoryService('whadmin', {
 			name: 'test cate 3',
 			parentId: categories[0],
 			attribute: [{ name: 'attribute 2' }],
 		});
 		categories.push(result.message.toString());
-	})
-	.then(() => console.log(categories))
-	.then(async () => {
-		const result = await insertProductService('whadmin', {
+		return categories;
+	} catch (e) {
+		console.error('Error occured', e);
+	}
+}
+
+async function populateProduct(categories) {
+	let products = [];
+	try {
+		let result = await insertProductService('staff', {
 			name: 'test product name 1',
 			brand: 'test brand 1',
 			price: 18000,
@@ -111,9 +110,7 @@ Promise.resolve()
 			pAttribute: null,
 		});
 		products.push(result.message);
-	})
-	.then(async () => {
-		const result = await insertProductService('whadmin', {
+		result = await insertProductService('staff', {
 			name: 'test product name 2',
 			brand: 'test brand 2',
 			price: 35000,
@@ -131,24 +128,75 @@ Promise.resolve()
 			],
 		});
 		products.push(result.message);
-	})
-	.then(() => console.log(products))
-	.then(async () => {
-		const result = await createPO('whadmin', {
+		return products;
+	} catch (e) {
+		console.error('Error occured', e);
+	}
+}
+
+async function populateInventory(products) {
+	let poStatus = [];
+	try {
+		let result = await createPOService('staff', {
 			id: products[0],
 			qty: 100,
 		});
-		POStatus.push(result.message);
-	})
-	.then(async () => {
-		const result = await createPO('whadmin', {
+		poStatus.push(result.message);
+		result = await createPOService('staff', {
 			id: products[1],
 			qty: 200,
 		});
-		POStatus.push(result.message);
-	});
-// Insert category
+		poStatus.push(result.message);
 
-// Insert product
+		return poStatus;
+	} catch (e) {
+		console.error('Error occured', e);
+	}
+}
 
-//update product inventory
+async function transferProduct(products, warehouses) {
+	let transferStatus = [];
+	try {
+		const result = await transferInventoryService('staff', {
+			id: products[0],
+			fromWhId: warehouses[0],
+			toWhId: warehouses[2],
+			qty: 10,
+		});
+		transferStatus.push(result.message);
+		return transferStatus;
+	} catch (e) {
+		console.error('Error occured', e);
+	}
+}
+
+async function initSQL() {
+	let conn;
+	try {
+		conn = await getMySqlConn('root');
+		const sqlScript = fs.readFileSync('./sql/asm3.sql', 'utf-8');
+
+		const sqls = sqlScript
+			.split(/--.*(?:\r\n|\r|\n|$)/)
+			.filter((statement) => {
+				return statement.trim();
+			});
+
+		for (const sql of sqls) {
+			try {
+				await conn.query(sql);
+			} catch (e) {
+				console.error(`Error executing SQL statement: ${sql}`);
+				console.error(e.message);
+			}
+		}
+	} catch (e) {
+		console.error(`Error: ${e.message}`);
+	} finally {
+		if (!!conn) {
+			await conn.end();
+		}
+	}
+}
+
+module.exports = { populateData: main };

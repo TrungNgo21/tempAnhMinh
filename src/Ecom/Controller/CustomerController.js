@@ -1,6 +1,5 @@
 const express = require('express');
 
-const bodyParser = require('body-parser');
 const { getAvailableProductService } = require('../Service/EcomService');
 
 const app = express();
@@ -13,25 +12,28 @@ app.use(express.static('views'));
 app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
-    res.render('index', { title: 'ecom home' });
+	res.render('index', { title: 'ecom home' });
 });
 app.get('/display_item', async (req, res) => {
-    try {
-        const response = await getAvailableProductService();
-        if (!response.err) res.status(200).send(response.message);
-        else res.status(500).json({ error: response.message });
-    } catch (e) {
-        res.status(500).json({ error: e.message });
-    }
+	try {
+		const response = await getAvailableProductService();
+		if (!response.err) {
+			res.status(200).send(response.message);
+		} else {
+			res.status(500).json({ error: response.message });
+		}
+	} catch (e) {
+		res.status(500).json({ error: e.message });
+	}
 });
 
 app.post('/productDetail', async (req, res) => {
-    //call service get detail info of product with id = req.body.productId
-    res.status(200).send({ message: 'product page go here' });
+	//call service get detail info of product with id = req.body.productId
+	res.status(200).send({ message: 'product page go here' });
 });
 
 app.listen(port, () => {
-    console.log(`App listening  on port ${port}`);
+	console.log(`App listening  on port ${port}`);
 });
 
 // const item = [
