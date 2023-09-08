@@ -167,7 +167,7 @@ async function renderDisplay() {
             const res = await sendPostRequest(`/productDetail`, {productId: productLink.id})
             // console.log(JSON.stringify({productId: productLink.id}))
             // console.log(await res.json())
-            window.location.replace('http://localhost:5501/product_detail')
+            window.location.href= '/product_detail'
         });
         rowDiv.appendChild(productLink);
     })
