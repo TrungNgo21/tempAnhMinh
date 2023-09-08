@@ -16,7 +16,8 @@ body{
 }
 .card-wrapper{
     max-width: 1100px;
-    margin: 0 auto;
+    margin: auto;
+    margin-top: 20px;
 }
 img{
     width: 100%;
@@ -30,23 +31,7 @@ img{
     width: 100%;
     transition: all 0.5s ease;
 }
-.img-showcase img{
-    min-width: 100%;
-}
-.img-select{
-    display: flex;
-}
-.img-item{
-    margin: 0.3rem;
-}
-.img-item:nth-child(1),
-.img-item:nth-child(2),
-.img-item:nth-child(3){
-    margin-right: 0;
-}
-.img-item:hover{
-    opacity: 0.8;
-}
+
 .product-content{
     padding: 2rem 1rem;
 }
@@ -121,8 +106,6 @@ img{
 .product-detail ul li{
     margin: 0;
     list-style: none;
-    background: url(shoes_images/checked.png) left center no-repeat;
-    background-size: 18px;
     padding-left: 1.7rem;
     margin: 0.4rem 0;
     font-weight: 600;
