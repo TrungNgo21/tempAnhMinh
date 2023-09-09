@@ -20,7 +20,7 @@
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-      
+
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
@@ -45,8 +45,8 @@
           </form>
         </div>
       </nav>
-    
-      
+
+
       <div aria-label="breadcrumb">
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -54,7 +54,7 @@
           <li class="breadcrumb-item" aria-current="page">Data</li>
         </ol>
       </div>
-    
+
     <div class = "card-wrapper">
       <div class = "card">
         <!-- card left -->
@@ -66,10 +66,10 @@
         </div>
 
         <!-- card right -->
-        <div class = "product-content">          
+        <div class = "product-content">
           <h2 class = "product-title" id = "product-title" ></h2>
           <div class = "product-price">
-            <p class = "price" id = "price"></p>  
+            <p class = "price" id = "price"></p>
           </div>
 
           <div class = "product-detail" id = "product-detail">
@@ -85,142 +85,13 @@
             </button>
           </div>
 
-          
+
         </div>
       </div>
     </div>
 
-    
-    <script>
 
-      
+    <script src="scripts/itemDetailScripts.js"></script>
 
-async function getDetail(){
-  try {
-    const requestOptions = {
-      method: 'GET',
-      
-    }
-    const res = await fetch('/retreive_detail', requestOptions)
-    return await res.json()
-    if (!response.ok) {
-      throw new Error('Error fetching product data')
-      }
-    } catch (e) {
-        console.error('Error fetching data', e)
-        return []
-    }
-}
-
-async function renderDetail() {
-
-  const productData = await getDetail()
-  console.log(productData.image)
-
-  const img_showcase = document.getElementById('img-showcase');
-
-  const img = document.createElement('img');
-  img.src = `${productData.image}`;
-  img_showcase.appendChild(img)
-
-  const productInfo = document.getElementById('product-attribute');
-  const productTitle = document.getElementById('product-title')
-  productTitle.innerHTML = `${productData.name}`
-
-  const price = document.getElementById('price')
-  price.innerHTML = `Price: <span>$${productData.price}</span>`
-
-  const productDetailList = document.getElementById('product-detail-list')
-
-  const brand = document.createElement('li')
-  brand.innerHTML = `Brand: <span>${productData.brand}</span>`
-  const color = document.createElement('li')
-  color.innerHTML = `Color: <span>${productData.color}</span>`
-  const dimension = document.createElement('li')
-  dimension.innerHTML = `Dimension: <span>${productData.dimension}</span>`
-  const category = document.createElement('li')
-  category.innerHTML = `Category: <span>${productData.category}</span>`
-  const attribute = document.createElement('li')
-  attribute.innerHTML = `Attribute: <span>${productData.attribute}</span>`
-  const pAttribute = document.createElement('li')
-  pAttribute.innerHTML = `pAttribute: <span>${productData.pAttribute}</span>`
-
-  productDetailList.appendChild(brand)
-  productDetailList.appendChild(color)
-  productDetailList.appendChild(dimension)
-  productDetailList.appendChild(category)
-  productDetailList.appendChild(attribute)
-  productDetailList.appendChild(pAttribute)
-  
-
-
-
-
-// id: 2,
-//     image: "Banana-Single.jpg",
-//     name: "Mouse",
-//     brand: "Razer",
-//     price: "180",
-//     color: "Black",
-//     dimension: "100 x 90 x 80",
-//     category: "Mouse",
-//     attribute: "Wireless",
-//     pAttribute: "Electronic",
-//     inventory: 1000,
-
-//     <li>Color: <span>Black</span></li>
-//     <li>Available: <span>in stock</span></li>
-//     <li>Category: <span>Shoes</span></li>
-//     <li>Shipping From: <span>Warehouse A</span></li>
-//     <li>Shipping Fee: <span>Free</span></li>
-  
-
-  // <h2 class = "product-title">Razer Mosue</h2>
-
-// <div class = "product-price">
-//   <p class = "price">Price: <span>$249.00</span></p>
-// </div>
-
-// <div class = "product-detail">
-//   <h2>about this item: </h2>
-//     <ul>
-
-//   </ul>
-// </div>
-
-// <div class = "img-display">
-//             <div class = "img-showcase">
-//               <img src = 'Banana-Single.jpg' alt = "product image">
-//             </div>
-//           </div>
-//           <div class = "img-select">
-//             <div class = "img-item">
-//               <a href = "#">
-//                 <img src = 'Banana-Single.jpg' alt = "product image">
-//               </a>
-//             </div>
-//             <div class = "img-item">
-//               <a href = "#">
-//                 <img src = 'Banana-Single.jpg' alt = "product image">
-//               </a>
-//             </div>
-//             <div class = "img-item">
-//               <a href = "#">
-//                 <img src = 'Banana-Single.jpg' alt = "product image">
-//               </a>
-//             </div>
-//             <div class = "img-item">
-//               <a href = "#">
-//                 <img src = 'Banana-Single.jpg' alt = "product image">
-//               </a>
-//             </div>
-//           </div>
-
-}
-
-$(document).ready(()=>{
-  renderDetail()
-})
-    </script>
   </body>
 </html>

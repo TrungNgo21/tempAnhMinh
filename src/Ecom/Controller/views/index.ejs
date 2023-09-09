@@ -21,7 +21,7 @@
             padding: 10px;
         }
     </style>
-  
+
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -29,7 +29,7 @@
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-  
+
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item active">
@@ -55,7 +55,7 @@
     </div>
   </nav>
 
-  
+
   <div aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -82,158 +82,12 @@
 		</div>
 </section>
     </div>
+
 </body>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script src="scripts/indexScripts.js"></script>
 <script>
-    //get data
-async function getItem(param) {
-    try {
-        const requestOptions = {
-            method: 'GET',
-            // headers: {
-            //     'Content-Type': 'application/json'
-            // },
-            // body: JSON.stringify({ category: 'some category' })
-        }
-        const res = await fetch('/display_item', requestOptions)
-        return await res.json()
-
-        if (!response.ok) {
-            throw new Error('Error fetching product data')
-        }
-    } catch (e) {
-        console.error('Error fetching data', e)
-        return []
-    }
-}
-
-//send post request
-async function sendPostRequest(url, req) {
-    try {
-        const requestOptions = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(req),
-        };
-        const response = await fetch(url, requestOptions);
-        if (!response.ok) {
-            throw new Error('Error sending POST request');
-        }
-        return response;
-    } catch (error) {
-        console.error('Error sending POST request:', error);
-        return {};
-    }
-}
-
-async function renderDisplay() {
-    const productData = await getItem()
-    const productListDiv = document.getElementById('Display-Item');
-
-    let rowDiv;
-
-    productData.forEach((product, index) => {
-
-        if (index % 5 === 0) {
-            rowDiv = document.createElement('div');
-            rowDiv.className = 'product-row';
-            productListDiv.appendChild(rowDiv)
-        }
-        
-        const productInfo = document.createElement('div')
-        const productName = document.createElement('h5')
-        productInfo.className = "productInfo"
-        productInfo.style.paddingLeft = "10px"
-        productName.innerText = `${product.name}`
-        productInfo.appendChild(productName)
-        const productImg = document.createElement('div');
-        const img = document.createElement('img');
-        img.src = `${product.image}`;
-        productImg.className = "productImg"
-        img.style = 'width:100%';
-        productImg.appendChild(img)
-
-        const productLink = document.createElement('a');
-        productLink.appendChild(productImg)
-        productLink.appendChild(productInfo)
-        productLink.id = `${product.id}`
-        productLink.href = `javascript:void(0);`;
-        productLink.className = 'product-link';
-
-        productLink.addEventListener('click', async () => {
-            const res = await sendPostRequest(`/productDetail`, {productId: productLink.id})
-            // console.log(JSON.stringify({productId: productLink.id}))
-            // console.log(await res.json())
-            window.location.href= '/product_detail'
-        });
-        rowDiv.appendChild(productLink);
-    })
-}
-
-$(document).ready(()=>{
-    renderDisplay()
-})
-
-// const displayItem = (itemList) => {
-//     const displayElement = document.getElementById("Display-Item");
-//     displayElement.innerHTML = '';
-//
-//     for (let i = 0; i < itemList.length; i++){
-//         const productHTML = `
-//             <div class='col-md-6 col-lg-4 col-xl-3'>
-//                 <div id = 'product' class='single-product'>
-//                     <a href='#' class='product_link' id="product-${itemList[i].id}">
-//                         <div class='part-1'>
-//                             <img src="${itemList[i].image}" alt='product-img' style='width: 255px;'>
-//                         </div>
-//                         <div class='part-2'>
-//                             <h3 class='product-title'>${itemList[i].name}</h3>
-//                             <h3 class='product-price'>${itemList[i].price}</h3>
-//                             <h3 class='product-brand'>${itemList[i].brand}</h3>
-//                         </div>
-//                     </a>
-//                 </div>
-//             </div>
-//             `;
-//         displayElement.innerHTML += productHTML
-//     }
-//
-//     for (let i = 0; i < itemList.length; i++){
-//         const productLink = document.getElementById(`product-${itemList[i][2]}`)
-//         productLink.addEventListener('click', () => {
-//
-//         })
-//     }
-// }
-
-// function display_item(item_list){
-// document.getElementById("Display-Item").innerHTML = ''
-//
-// for (let i = 0; i < item_list.length; i++) {
-//   const myArray = Object.values(item_list[i]);
-//
-//
-//   document.getElementById("Display-Item").innerHTML += "<div class=>"
-// 								+"<div id='product' class='single-product'>"
-// 									+"<a href='product_detail.html'>"
-// 										+"<div class='part-1'>"
-// 											+"<img src="+myArray[0]+" alt='product-img' style='width: 255px;'>"
-// 										+"</div>"
-// 										+"<div class='part-2'>"
-// 												+"<h3 class='product-title'>"+myArray[1]+"</h3>"
-// 									+"</a>"
-// 												+"<h4 class='product-price'>$"+myArray[3]+"</h4>"
-//                         						+"<h6 class='product-brand'>"+myArray[2]+"</h6>"
-// 												+"<h6 class='product-warehouse'>Shipped From: "+myArray[4]+"</h6>"
-// 										+"</div>"
-//
-// 								+"</div>"
-// 						+"</div>";
-//   }
-// }
 
 </script>
 </html>

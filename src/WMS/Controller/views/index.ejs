@@ -30,12 +30,8 @@
   </div>
 </body>
 
-<script src='scripts/scripts.js'></script>
+<script type='module' src='scripts/scripts.js'></script>
 <script>
-  const token = document.cookie.split('; ').find((row) => row.startWith('access_token=')).split('=')[1];
-
-  checkTokenValidity(token)
-
   const category = ["Electronic", "Food", "Skincare","Clothing"]
   for (let i = 0; i < category.length; i++) {
   document.getElementById("category").innerHTML += "<option value ='" + category[i] + "'>"+ category[i]+"</option>";

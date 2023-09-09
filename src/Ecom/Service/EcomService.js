@@ -30,7 +30,7 @@ async function getAvailableProductService() {
 async function getProductDetailService(mapObject) {
 	try {
 		const mongoReturn = await getProduct('customer', mapObject.id);
-		const mysqlReturn = await getProductInventory('root', mapObject.id);
+		const mysqlReturn = await getProductInventory('customer', mapObject.id);
 		if (!mongoReturn.err && !mysqlReturn.err) {
 			const returnDTO = new ProductDetail(
 				mongoReturn.message,
