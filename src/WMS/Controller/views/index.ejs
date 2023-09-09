@@ -9,11 +9,11 @@
   <div class ="nav-bar">
     <h1>Shop name</h1>
     <div class = "filter-section">
-      <div class="breadcrumb" id="breadcrumb"> 
+      <div class="breadcrumb" id="breadcrumb">
         <p>Home</p>
       </div>
-      <form action="/", method="get" id = "Search" name = "Search" onsubmit="filterListing()">    
-        <input type="text" id="searched_name" name = "searched_name" placeholder="Search for names.."> 
+      <form action="/", method="get" id = "Search" name = "Search" onsubmit="filterListing()">
+        <input type="text" id="searched_name" name = "searched_name" placeholder="Search for names..">
         &emsp;
         <label for="category">Choose a category:</label>
         <select id="category" name="category">
@@ -24,14 +24,18 @@
     </div>
 
     <div class = "Display-Item" id ="Display-Item">
-      
+
     </div>
   </div>
   </div>
 </body>
 
-
+<script src='scripts/scripts.js'></script>
 <script>
+  const token = document.cookie.split('; ').find((row) => row.startWith('access_token=')).split('=')[1];
+
+  checkTokenValidity(token)
+
   const category = ["Electronic", "Food", "Skincare","Clothing"]
   for (let i = 0; i < category.length; i++) {
   document.getElementById("category").innerHTML += "<option value ='" + category[i] + "'>"+ category[i]+"</option>";
@@ -55,7 +59,7 @@
 
 for (let i = 0; i < 10; i++) {
   const myArray = Object.values(item[i]);
-  
+
   document.getElementById("Display-Item").innerHTML += "<div class = 'item'> <hr><ul><li><a href='product_detail.html'>"
                                                     + myArray[0] +"</a></li><li>"
                                                     +myArray[1]+"</li><li>"

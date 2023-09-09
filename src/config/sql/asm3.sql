@@ -53,6 +53,9 @@ create database public;
 use public;
 
 -- Drop tables if exists
+drop table if exists users;
+
+-- Drop tables if exists
 drop table if exists warehouse_inventory;
 
 -- Drop tables if exists
@@ -66,6 +69,26 @@ drop table if exists transaction;
 
 -- Drop tables if exists
 drop table if exists product;
+
+-- Create users table
+create table users(
+    id int auto_increment primary key,
+    username varchar(255) not null unique,
+    password varchar(255) not null,
+    role ENUM('whadmin', 'staff', 'customer')
+);
+
+-- insert users table
+insert into users (username, password, role)
+values ('admin', '$2b$05$A12iFK9mLG.GCsywdZ8pSettDiBobmROVkD5gKYGQhnHmkqzgZoTy', 'whadmin'),
+       ('staff','$2b$05$A12iFK9mLG.GCsywdZ8pSe8810skpDO4zthGjKw.PFZ5dlMAzK0kG', 'staff');
+
+-- Create tokens table
+create table tokens (
+    id int auto_increment primary key,
+    username varchar(255) not null ,
+    token varchar(512) not null
+);
 
 -- Create warehouse table
 create table warehouse(

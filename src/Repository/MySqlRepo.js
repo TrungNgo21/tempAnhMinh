@@ -1,11 +1,6 @@
 const getMySqlConn = require('../config/sql/connector');
-const {
-	MongoProductDTO,
-	MySqlUpdateProductDTO,
-	TransferDTO,
-	UpdateInventoryDTO,
-} = require('../DTO/Product');
-const { UpdateWarehouseDTO } = require('../DTO/Warehouse');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const TYPE = {
 	SELECT: true,
@@ -197,6 +192,60 @@ async function getProductInventory(user, id) {
 	}
 }
 
+async function authenticateUser(username, password) {
+	try {
+		const result = await queryWrapper(
+			'root',
+			`select * from users where binary username ='${username}'`
+		);
+		if (result.length === 0) {
+			return { err: true };
+		}
+		const user = result[0];
+		const passwordMatch = await bcrypt.compare(password, user.password);
+		if (passwordMatch) {
+			const token = await storeAccessToken(user.username);
+			return { err: false, token: token.token };
+		}
+		return { err: true };
+	} catch (e) {
+		console.error(e);
+		return { err: true };
+	}
+}
+
+async function storeAccessToken(username) {
+	const root = 'root';
+	try {
+		const token = jwt.sign({ username }, '92BC8A7FBBD5475D75C11CC1EA98E', {
+			expiresIn: '1h',
+		});
+		await queryWrapper(
+			root,
+			`insert into tokens (username, token) value ('${username}', '${token}')`
+		);
+		return { err: false, token: token };
+	} catch (e) {
+		return { err: true, message: e.message };
+	}
+}
+
+async function getUserRole(username) {
+	const root = 'root';
+	try {
+		const result = await queryWrapper(
+			root,
+			`select role from users where binary username = '${username}'`
+		);
+		if (result.length === 0) {
+			return { err: true };
+		}
+		return { err: false, role: result[0].role };
+	} catch (e) {
+		return { err: true, message: e.message };
+	}
+}
+
 async function queryWrapper(user, sql) {
 	let conn;
 	try {
@@ -223,4 +272,6 @@ module.exports = {
 	transferInventMySql: transferInvent,
 	getAvailableProductMySql: getAvailableProduct,
 	getProductInventory: getProductInventory,
+	authenticateUser: authenticateUser,
+	getUserRole: getUserRole,
 };
