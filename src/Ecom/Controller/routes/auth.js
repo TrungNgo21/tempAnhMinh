@@ -18,9 +18,7 @@ router.post('/', async (req, res) => {
 		if (!authentication.success) {
 			return res.send('Invalid username or password');
 		}
-		const token = `?token=${encodeURIComponent(authentication.token)}`;
-		res.append('token', authentication.token);
-		res.redirect('/protected/');
+		res.send({ token: authentication.token });
 	} catch (e) {
 		console.error(e);
 	}

@@ -90,7 +90,8 @@ values ('admin', '$2b$05$A12iFK9mLG.GCsywdZ8pSettDiBobmROVkD5gKYGQhnHmkqzgZoTy',
 
 -- Create users table
 create table user_cart(
-    userId varchar(255) primary key ,
+    id int primary key auto_increment,
+    userId varchar(255) not null ,
     productId varchar(24) not null ,
     quantity int not null ,
     unique (userId, productId)

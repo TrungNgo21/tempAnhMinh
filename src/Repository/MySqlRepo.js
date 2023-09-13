@@ -1,6 +1,7 @@
 const getMySqlConn = require('../config/sql/connector');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { query } = require('express');
 
 const TYPE = {
 	SELECT: true,
@@ -249,12 +250,12 @@ async function getUser(token) {
 	try {
 		const result = await queryWrapper(
 			root,
-			`select id from tokens where binary token = '${token}'`
+			`select username from tokens where binary token = '${token}'`
 		);
 		if (result.length === 0) {
 			return { err: true };
 		}
-		return { err: false, id: result[0].id };
+		return { err: false, id: result[0].username };
 	} catch (e) {
 		return { err: true, message: e.message };
 	}
@@ -265,12 +266,28 @@ async function updateUserCart(userId, productId, quantity) {
 	try {
 		const result = await queryWrapper(
 			root,
-			`insert into user_cart value (${userId}, ${productId}, ${quantity})`
+			`insert into user_cart (userId, productId, quantity) value ('${userId}', '${productId}', '${quantity}') on duplicate key update quantity = quantity + ${quantity}`
 		);
 		if (result.affectedRows !== 1) {
 			return { err: true, message: 'error insert values' };
 		}
 		return { err: false, message: 'success add product to user cart' };
+	} catch (e) {
+		return { err: true, message: 'system error' };
+	}
+}
+
+async function getUserCart(userId) {
+	const root = 'root';
+	try {
+		const result = await queryWrapper(
+			root,
+			`select productId, quantity from user_cart where binary userId = '${userId}' order by productId asc `
+		);
+		if (result.length === 0) {
+			return { err: true };
+		}
+		return { err: false, products: result };
 	} catch (e) {
 		return { err: true, message: 'system error' };
 	}
@@ -306,6 +323,5 @@ module.exports = {
 	getUserRole: getUserRole,
 	getUser: getUser,
 	updateUserCart: updateUserCart,
+	getUserCart: getUserCart,
 };
-
-// console.log(bcrypt.hashSync('customerpass', 5));

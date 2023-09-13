@@ -19,7 +19,7 @@ async function authenticateUserService(mapObject) {
 }
 
 async function authenticateTokenService(req, res, next) {
-	console.log(req.session.valid);
+	// console.log(req.query.token);
 	const token = req.query.token;
 
 	if (!token) {

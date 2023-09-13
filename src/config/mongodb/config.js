@@ -134,26 +134,22 @@ async function writeConfigFile(configFile, finalConfig, encoding = 'utf8') {
 }
 
 async function setConfig() {
-	const conf = `
-systemLog:
-  destination: file
-  path: /Users/minhle/Desktop/svr/log/mongo.log
-  logAppend: true
-storage:
-  dbPath: /Users/minhle/Desktop/svr/db
-net:
-  bindIp: 127.0.0.1, ::1
-  ipv6: true`;
+	const confMac =
+		'systemLog:\n  destination: file\n  path: /Users/minhle/Desktop/svr/log/mongo.log\n  logAppend: true\nstorage:\n  dbPath: /Users/minhle/Desktop/svr/db\nnet:\n  bindIp: 127.0.0.1\nport: 27017';
+
+	const confWin =
+		'systemLog:\n  destination: file\n  path: "W:\\\\Program Files\\\\MongoDB\\\\Server\\\\7.0\\\\log\\\\mongo.log"\n  logAppend: true\nstorage:\n  dbPath: "W:\\\\Program Files\\\\MongoDB\\\\Server\\\\7.0\\\\data"\nnet:\n  bindIp: 127.0.0.1\n  port: 27017';
 
 	try {
 		const platform = os.platform();
 		let configFile;
 		if (platform === 'win32') {
 			configFile = 'C:/Program Files/MongoDB/Server/7.0/bin/mongod.cfg';
+			await writeConfigFile(configFile, confWin);
 		} else {
 			configFile = '/usr/local/etc/mongod.conf';
+			await writeConfigFile(configFile, confMac);
 		}
-		await writeConfigFile(configFile, conf);
 		console.log('Setup complete');
 	} catch (e) {
 		console.error(`Error creating MongoDB configuration: ${e.message}`);

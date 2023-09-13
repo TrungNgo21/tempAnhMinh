@@ -167,6 +167,32 @@ async function getAllProduct(user, listId) {
 	}
 }
 
+async function getCartProduct(listId, user = 'customer') {
+	let conn;
+	try {
+		conn = await getMongoConn(user);
+		const popObject = {
+			path: 'category',
+			model: conn.cate,
+			options: { sort: { position: -1 } },
+			select: 'name',
+		};
+		const result = await conn.product
+			.find({ _id: { $in: listId } })
+			.populate(popObject)
+			.sort({ _id: 1 })
+			.lean()
+			.exec();
+		return { err: false, message: result };
+	} catch (e) {
+		throw Error(e.message);
+	} finally {
+		if (!!conn) {
+			await conn.conn.close();
+		}
+	}
+}
+
 async function getProduct(user, id) {
 	let conn;
 	try {
@@ -289,4 +315,5 @@ module.exports = {
 	updateCategoryMongo: updateCategory,
 	insertCategoryMongo: insertCategory,
 	getProduct: getProduct,
+	getCartProduct: getCartProduct,
 };

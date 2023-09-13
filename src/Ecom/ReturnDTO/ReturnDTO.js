@@ -59,4 +59,33 @@ class ECOMProdDetail {
 	}
 }
 
-module.exports = { ECOMProdList: ECOMProdList, ProductDetail: ECOMProdDetail };
+class CartProd {
+	constructor(mongoReturn, mysqlReturn) {
+		this.array = mongoReturn.map((mongoProduct) => {
+			const id = mongoProduct._id.toString();
+			const matchMysqlProduct = mysqlReturn.find(
+				(mysqlProduct) => mysqlProduct.productId === id
+			);
+			if (matchMysqlProduct) {
+				return {
+					image: '/Banana-Single.jpg',
+					id: id,
+					name: mongoProduct.name,
+					category: mongoProduct.category.name,
+					price: mongoProduct.price,
+					quantity: matchMysqlProduct.quantity,
+				};
+			}
+		});
+	}
+
+	getCart() {
+		return this.array;
+	}
+}
+
+module.exports = {
+	ECOMProdList: ECOMProdList,
+	ProductDetail: ECOMProdDetail,
+	CartProduct: CartProd,
+};

@@ -1,13 +1,13 @@
 const params = new URLSearchParams(window.location.search);
 const productId = params.get('productId');
 
-async function fetchProduct() {
+async function fetchProduct(token) {
 	try {
 		const requestOptions = {
 			method: 'GET',
 		};
 		const res = await fetch(
-			`/protected/product/${productId}`,
+			`/protected/product/?productId=${productId}&&token=${token}`,
 			requestOptions
 		);
 		const result = await res.json();
@@ -18,7 +18,6 @@ async function fetchProduct() {
 }
 
 function renderDetail(productData) {
-	console.log(productData);
 	const img_showcase = document.getElementById('img-showcase');
 
 	const img = document.createElement('img');
@@ -58,29 +57,40 @@ function renderDetail(productData) {
 	productDetailList.appendChild(productDetail);
 }
 
-async function addToCart(url, req) {
+async function addToCart(event, token, productId) {
+	event.preventDefault();
+	const quantity = document.getElementById('cartQuantity').value;
 	try {
 		const requestOptions = {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify(req),
+			body: JSON.stringify({
+				productId: productId,
+				quantity: quantity,
+			}),
 		};
-		const response = await fetch(url, requestOptions);
+		const response = await fetch(
+			`/protected/product/addCart?token=${token}`,
+			requestOptions
+		);
 	} catch (e) {
 		console.error(e.message);
 	}
 }
 
 $(document).ready(async () => {
+	const urlParam = new URLSearchParams(window.location.search);
+	const token = urlParam.get('token');
+	const productId = urlParam.get('productId');
 	try {
-		const data = await fetchProduct();
+		const data = await fetchProduct(token);
 		renderDetail(data);
 		document
 			.getElementById('add-cart-button')
 			.addEventListener('click', async (event) => {
-				event.preventDefault();
+				await addToCart(event, token, productId);
 			});
 	} catch (e) {
 		console.error(e);

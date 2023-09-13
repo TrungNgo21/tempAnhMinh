@@ -1,15 +1,16 @@
-let isRender = false;
-let token;
-async function fetchProducts() {
+async function fetchProducts(token) {
 	try {
 		const requestOptions = {
 			method: 'GET',
 		};
-		const res = await fetch('/protected/getProducts', requestOptions);
+		const res = await fetch(
+			`/protected/getProducts?token=${token}`,
+			requestOptions
+		);
 		const result = await res.json();
 		return result.products;
 	} catch (error) {
-		console.error('Error sending POST request:', error);
+		console.error('Error sending GET request:', error);
 	}
 }
 
@@ -30,7 +31,7 @@ async function sendPostRequest(url, req) {
 	}
 }
 
-function renderProducts(products) {
+function renderProducts(products, token) {
 	const productListDiv = document.getElementById('Display-Item');
 	let rowDiv;
 
@@ -62,18 +63,25 @@ function renderProducts(products) {
 		productLink.className = 'product-link';
 
 		productLink.addEventListener('click', async () => {
-			window.location.href = `/protected/productDetail?productId=${productLink.id}`;
+			window.location.href = `/protected/productDetail?productId=${productLink.id}&&token=${token}`;
 		});
 		rowDiv.appendChild(productLink);
 	});
 }
 
-$(document).ready(async (data) => {
-	token = data.token;
+document.addEventListener('DOMContentLoaded', async () => {
+	const urlParam = new URLSearchParams(window.location.search);
+	const token = urlParam.get('token');
 	try {
-		const data = await fetchProducts();
-		await renderProducts(data);
+		const data = await fetchProducts(token);
+		await renderProducts(data, token);
 	} catch (e) {
 		console.error(e);
 	}
+
+	const cartButton = document.getElementById('cart-button');
+	cartButton.addEventListener('click', async (event) => {
+		event.preventDefault();
+		window.location.href = `/protected/cart?token=${token}`;
+	});
 });
