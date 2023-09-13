@@ -133,7 +133,18 @@ async function writeConfigFile(configFile, finalConfig, encoding = 'utf8') {
 	});
 }
 
-async function updateMongoDBConfig() {
+async function setConfig() {
+	const conf = `
+systemLog:
+  destination: file
+  path: /Users/minhle/Desktop/svr/log/mongo.log
+  logAppend: true
+storage:
+  dbPath: /Users/minhle/Desktop/svr/db
+net:
+  bindIp: 127.0.0.1, ::1
+  ipv6: true`;
+
 	try {
 		const platform = os.platform();
 		let configFile;
@@ -142,14 +153,32 @@ async function updateMongoDBConfig() {
 		} else {
 			configFile = '/usr/local/etc/mongod.conf';
 		}
-		const data = await readConfigFile(configFile, 'utf8');
+		await writeConfigFile(configFile, conf);
+		console.log('Setup complete');
+	} catch (e) {
+		console.error(`Error creating MongoDB configuration: ${e.message}`);
+	}
+}
 
-		const updateConfig = data.replace(
-			/(\s*)#?(\s*)security:(\s*)/,
-			'$1security:\n  authorization: enabled\n'
-		);
+async function updateMongoDBConfig() {
+	try {
+		const platform = os.platform();
+		let configFile;
+		if (platform === 'win32') {
+			configFile = 'C:/Program Files/MongoDB/Server/7.0/bin/mongod.cfg';
+			const data = await readConfigFile(configFile, 'utf8');
 
-		await writeConfigFile(configFile, updateConfig, 'utf8');
+			const updateConfig = data.replace(
+				/(\s*)#?(\s*)security:(\s*)/,
+				'$1security:\n  authorization: enabled\n'
+			);
+
+			await writeConfigFile(configFile, updateConfig);
+			// const data = await readConfigFile(configFile, 'utf8');
+		} else {
+			const configFile = '/usr/local/etc/mongod.conf';
+		}
+
 		console.log('Access control enabled');
 	} catch (e) {
 		console.error(`Error updating MongoDB configuration: ${e.message}`);
@@ -159,7 +188,6 @@ async function updateMongoDBConfig() {
 async function stopMongoDB() {
 	try {
 		const platform = os.platform();
-		let restartCommand;
 
 		console.log('stopping MongoDB');
 		if (platform === 'win32') {
@@ -172,7 +200,9 @@ async function stopMongoDB() {
 			}
 			console.log(`MongoDB stop status: ${stdout}`);
 		} else {
-			const { stdout, stderr } = await exec('brew services stop mongod');
+			const { stdout, stderr } = await exec(
+				'brew services stop mongodb-community'
+			);
 			if (stderr) {
 				console.log(`Error stop MongoDB: ${stderr}`);
 				return;
@@ -198,7 +228,9 @@ async function startMongoDB() {
 			}
 			console.log(`MongoDB start status: ${stdout}`);
 		} else {
-			const { stdout, stderr } = await exec('brew services start mongod');
+			const { stdout, stderr } = await exec(
+				'brew services start mongodb-community'
+			);
 			if (stderr) {
 				console.log(`Error start MongoDB: ${stderr}`);
 				return;
@@ -212,6 +244,9 @@ async function startMongoDB() {
 
 async function main() {
 	try {
+		await stopMongoDB();
+		await setConfig();
+		await startMongoDB();
 		await initMongoDBConfig();
 		await stopMongoDB();
 		await updateMongoDBConfig();

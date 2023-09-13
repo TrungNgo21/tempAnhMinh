@@ -125,7 +125,6 @@ img{
     padding: 0.45rem 0.8rem;
     outline: 0;
     margin-right: 0.2rem;
-    margin-bottom: 1rem;
 }
 .purchase-info input{
     width: 60px;
@@ -165,6 +164,10 @@ img{
     background: #000;
     border-color: transparent;
     color: #fff;
+}
+
+.shopping-icon{
+    padding-left: 4px;
 }
 
 @media screen and (min-width: 992px){

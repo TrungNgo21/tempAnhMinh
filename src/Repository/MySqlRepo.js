@@ -127,7 +127,6 @@ async function updateWarehouse(user, updateWhDTO) {
 
 async function updateInventory(user, updateInventoryDTO) {
 	try {
-		console.log(updateInventoryDTO);
 		const result = await queryWrapper(
 			user,
 			`call product_purchase_order ('${updateInventoryDTO.getId()}', ${updateInventoryDTO.getQty()})`
@@ -245,6 +244,37 @@ async function getUserRole(username) {
 		return { err: true, message: e.message };
 	}
 }
+async function getUser(token) {
+	const root = 'root';
+	try {
+		const result = await queryWrapper(
+			root,
+			`select id from tokens where binary token = '${token}'`
+		);
+		if (result.length === 0) {
+			return { err: true };
+		}
+		return { err: false, id: result[0].id };
+	} catch (e) {
+		return { err: true, message: e.message };
+	}
+}
+
+async function updateUserCart(userId, productId, quantity) {
+	const root = 'root';
+	try {
+		const result = await queryWrapper(
+			root,
+			`insert into user_cart value (${userId}, ${productId}, ${quantity})`
+		);
+		if (result.affectedRows !== 1) {
+			return { err: true, message: 'error insert values' };
+		}
+		return { err: false, message: 'success add product to user cart' };
+	} catch (e) {
+		return { err: true, message: 'system error' };
+	}
+}
 
 async function queryWrapper(user, sql) {
 	let conn;
@@ -274,4 +304,8 @@ module.exports = {
 	getProductInventory: getProductInventory,
 	authenticateUser: authenticateUser,
 	getUserRole: getUserRole,
+	getUser: getUser,
+	updateUserCart: updateUserCart,
 };
+
+// console.log(bcrypt.hashSync('customerpass', 5));

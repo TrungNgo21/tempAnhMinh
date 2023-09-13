@@ -190,6 +190,7 @@ async function initSQL() {
 				console.error(e.message);
 			}
 		}
+		console.log('Complete init sql server');
 	} catch (e) {
 		console.error(`Error: ${e.message}`);
 	} finally {

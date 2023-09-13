@@ -1,10 +1,11 @@
 let isRender = false;
+let token;
 async function fetchProducts() {
 	try {
 		const requestOptions = {
 			method: 'GET',
 		};
-		const res = await fetch('/getProducts', requestOptions);
+		const res = await fetch('/protected/getProducts', requestOptions);
 		const result = await res.json();
 		return result.products;
 	} catch (error) {
@@ -61,13 +62,14 @@ function renderProducts(products) {
 		productLink.className = 'product-link';
 
 		productLink.addEventListener('click', async () => {
-			window.location.href = `/productDetail?productId=${productLink.id}`;
+			window.location.href = `/protected/productDetail?productId=${productLink.id}`;
 		});
 		rowDiv.appendChild(productLink);
 	});
 }
 
-$(document).ready(async () => {
+$(document).ready(async (data) => {
+	token = data.token;
 	try {
 		const data = await fetchProducts();
 		await renderProducts(data);

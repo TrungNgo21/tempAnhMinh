@@ -5,7 +5,7 @@ class ECOMProdList {
 		this.array = [];
 		for (const item of arrayList) {
 			this.array.push({
-				image: 'Banana-Single.jpg',
+				image: '/Banana-Single.jpg',
 				id: item._id.toString(),
 				name: item.name,
 				brand: item.brand,
@@ -39,7 +39,7 @@ class ECOMProdDetail {
 		this.attribute = mongoReturn.attribute;
 		this.pAttribute = mongoReturn.pAttribute;
 		this.inventory = mysqlReturn.inventory;
-		this.image = 'Banana-Single.jpg';
+		this.image = '/Banana-Single.jpg';
 	}
 
 	getProductDetail() {

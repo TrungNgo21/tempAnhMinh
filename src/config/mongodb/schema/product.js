@@ -7,9 +7,9 @@ const productSchema = new Schema(
 		price: Number,
 		color: String,
 		dimension: {
-			width: mongoose.Schema.Types.Decimal128,
-			height: mongoose.Schema.Types.Decimal128,
-			length: mongoose.Schema.Types.Decimal128,
+			width: Number,
+			height: Number,
+			length: Number,
 		},
 		category: { type: mongoose.Schema.Types.ObjectId, ref: 'categories' },
 		attribute: { type: Map, of: String },

@@ -1,6 +1,8 @@
 const {
 	getAvailableProductMySql,
 	getProductInventory,
+	getUser,
+	updateUserCart,
 } = require('../../Repository/MySqlRepo');
 const { AvailableProdDTO } = require('../../DTO/Product');
 const {
@@ -8,6 +10,7 @@ const {
 	getProduct,
 } = require('../../Repository/MongodbRepo');
 const { ECOMProdList, ProductDetail } = require('../ReturnDTO/ReturnDTO');
+const { restartTries } = require('concurrently/src/defaults');
 
 async function getAvailableProductService() {
 	try {
@@ -46,8 +49,28 @@ async function getProductDetailService(mapObject) {
 		return { err: true, message: e.message };
 	}
 }
+async function addToCartService(mapObject) {
+	try {
+		const user = await getUser(mapObject.token);
+		if (user.err) {
+			return { err: true };
+		}
+		const mysqlReturn = await updateUserCart(
+			user.id,
+			mapObject.productId,
+			mapObject.quantity
+		);
+		if (mysqlReturn.err) {
+			return { err: true };
+		}
+		return { err: false };
+	} catch (e) {
+		console.error(e.message);
+	}
+}
 
 module.exports = {
 	getAvailableProductService: getAvailableProductService,
 	getProductDetailService: getProductDetailService,
+	addToCartService: addToCartService,
 };

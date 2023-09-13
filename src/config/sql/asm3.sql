@@ -56,6 +56,9 @@ use public;
 drop table if exists users;
 
 -- Drop tables if exists
+drop table if exists user_cart;
+
+-- Drop tables if exists
 drop table if exists warehouse_inventory;
 
 -- Drop tables if exists
@@ -70,6 +73,7 @@ drop table if exists transaction;
 -- Drop tables if exists
 drop table if exists product;
 
+
 -- Create users table
 create table users(
     id int auto_increment primary key,
@@ -81,7 +85,16 @@ create table users(
 -- insert users table
 insert into users (username, password, role)
 values ('admin', '$2b$05$A12iFK9mLG.GCsywdZ8pSettDiBobmROVkD5gKYGQhnHmkqzgZoTy', 'whadmin'),
-       ('staff','$2b$05$A12iFK9mLG.GCsywdZ8pSe8810skpDO4zthGjKw.PFZ5dlMAzK0kG', 'staff');
+       ('staff','$2b$05$A12iFK9mLG.GCsywdZ8pSe8810skpDO4zthGjKw.PFZ5dlMAzK0kG', 'staff'),
+       ('customer', '$2b$05$iiDHJ/P/BQpeFMs/Hh6.2uIF8pNMEyqPV856xmJ7Zr9piwzvae6Py', 'customer');
+
+-- Create users table
+create table user_cart(
+    userId varchar(255) primary key ,
+    productId varchar(24) not null ,
+    quantity int not null ,
+    unique (userId, productId)
+);
 
 -- Create tokens table
 create table tokens (
@@ -116,6 +129,7 @@ create table warehouse_inventory(
 create table transaction(
 	id bigint primary key AUTO_INCREMENT,
 	date timestamp not null default now(),
+	user varchar(255),
     quantity int not null,
     price bigint not null,
     unique (id, date)
