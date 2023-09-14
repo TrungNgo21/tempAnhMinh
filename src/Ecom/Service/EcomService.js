@@ -4,6 +4,7 @@ const {
 	getUser,
 	updateUserCart,
 	getUserCart,
+	removeUserCart,
 } = require('../../Repository/MySqlRepo');
 const { AvailableProdDTO } = require('../../DTO/Product');
 const {
@@ -94,9 +95,26 @@ async function getCartService(mapObject) {
 	}
 }
 
+async function removeCartService(mapObject) {
+	try {
+		const user = await getUser(mapObject.token);
+		if (user.err) {
+			return { err: true };
+		}
+		const mysqlReturn = await removeUserCart(user.id, mapObject.productId);
+		if (mysqlReturn.err) {
+			return { err: true };
+		}
+		return { err: false };
+	} catch (e) {
+		console.error(e.message);
+	}
+}
+
 module.exports = {
 	getAvailableProductService: getAvailableProductService,
 	getProductDetailService: getProductDetailService,
 	addToCartService: addToCartService,
 	getCartService: getCartService,
+	removeCartService: removeCartService,
 };

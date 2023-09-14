@@ -135,7 +135,7 @@ async function writeConfigFile(configFile, finalConfig, encoding = 'utf8') {
 
 async function setConfig() {
 	const confMac =
-		'systemLog:\n  destination: file\n  path: /Users/minhle/Desktop/svr/log/mongo.log\n  logAppend: true\nstorage:\n  dbPath: /Users/minhle/Desktop/svr/db\nnet:\n  bindIp: 127.0.0.1\nport: 27017';
+		'systemLog:\n  destination: file\n  path: /Users/minhle/Desktop/svr/log/mongo.log\n  logAppend: true\nstorage:\n  dbPath: /Users/minhle/Desktop/svr/db\nnet:\n  bindIp: 127.0.0.1\n  port: 27017';
 
 	const confWin =
 		'systemLog:\n  destination: file\n  path: "W:\\\\Program Files\\\\MongoDB\\\\Server\\\\7.0\\\\log\\\\mongo.log"\n  logAppend: true\nstorage:\n  dbPath: "W:\\\\Program Files\\\\MongoDB\\\\Server\\\\7.0\\\\data"\nnet:\n  bindIp: 127.0.0.1\n  port: 27017';

@@ -68,20 +68,3 @@ function renderProducts(products, token) {
 		rowDiv.appendChild(productLink);
 	});
 }
-
-document.addEventListener('DOMContentLoaded', async () => {
-	const urlParam = new URLSearchParams(window.location.search);
-	const token = urlParam.get('token');
-	try {
-		const data = await fetchProducts(token);
-		await renderProducts(data, token);
-	} catch (e) {
-		console.error(e);
-	}
-
-	const cartButton = document.getElementById('cart-button');
-	cartButton.addEventListener('click', async (event) => {
-		event.preventDefault();
-		window.location.href = `/protected/cart?token=${token}`;
-	});
-});

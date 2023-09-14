@@ -11,6 +11,11 @@ a:hover {
     color: inherit;
 }
 
+.productImg {
+    width:100%;
+
+}
+
 .ml-2 {
     margin-right: 6px; /* Adjust the margin to create a 4px gap */
 }
@@ -24,7 +29,10 @@ a:hover {
     padding: 10px;
 }
 
-.product-row {
+.display-item {
+    flex-wrap: wrap;
+    flex-grow: 5;
+    flex-direction: row;
     display: flex;
     align-items: center;
     margin-bottom: 10px;
@@ -41,6 +49,8 @@ a:hover {
     flex-grow: 1;
     display: flex;
     flex-direction: row;
+    justify-content: center;
+    align-items: center;
 }
 
 .description-column {
@@ -48,6 +58,7 @@ a:hover {
     display: flex;
     flex-direction: column;
     margin-right: 10px;
+    align-items: center;
 }
 
 .product-name {

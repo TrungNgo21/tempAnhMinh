@@ -30,19 +30,5 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 <script>
-    $(document).ready(()=>{
-        $('#wh-form').submit((e)=> {
-            e.preventDefault();
-            $.ajax({
-                url: '/getall',
-                type: 'post',
-                contentType: 'application/json',
-                data: JSON.stringify($('#wh-form').serializeArray()),
-                success: (response) => {
-                    console.log('500')
-                    console.log(response)
-                }
-            })
-        })
-    })
+
 </script>
