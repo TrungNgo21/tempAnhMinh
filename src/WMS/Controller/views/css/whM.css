@@ -1,0 +1,76 @@
+* {
+    box-sizing: border-box;
+  }
+
+  
+  #myTable {
+    border-collapse: collapse;
+    width: 70%;
+    border: 1px solid #ddd;
+    font-size: 15px;
+    margin: auto;
+    table-layout: fixed;
+  }
+  
+  #myTable th, #myTable td {
+    text-align: left;
+    padding: 12px;
+  }
+  
+  #myTable tr {
+    border-bottom: 1px solid #ddd;
+    line-height: 80%;
+  }
+  
+  #myTable tr.header, #myTable tr:hover {
+    background-color: #f1f1f1;
+  }
+
+  .search_form{
+    display: flex;
+    justify-content: center;
+  }
+
+  form.example {
+    width: 40%;
+    align-self: center;
+    margin: 1%;
+  }
+
+  form.example input[type=text] {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid grey;
+    float: left;
+    width: 80%;
+    background: #f1f1f1;
+  }
+  
+  /* Style the submit button */
+  form.example button {
+    float: left;
+    width: 20%;
+    padding: 10px;
+    background: #2196F3;
+    color: white;
+    font-size: 14px;
+    border: 1px solid grey;
+    border-left: none; /* Prevent double borders */
+    cursor: pointer;
+  }
+  
+  form.example button:hover {
+    background: #0b7dda;
+  }
+  
+  /* Clear floats */
+  form.example::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
+  
+
+  #myTable button{
+    margin-right: 5px;
+  }
