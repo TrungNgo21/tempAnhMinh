@@ -2,7 +2,7 @@
     box-sizing: border-box;
   }
 
-  
+
   #myTable {
     border-collapse: collapse;
     width: 70%;
@@ -11,17 +11,17 @@
     margin: auto;
     table-layout: fixed;
   }
-  
+
   #myTable th, #myTable td {
     text-align: left;
     padding: 12px;
   }
-  
+
   #myTable tr {
     border-bottom: 1px solid #ddd;
     line-height: 80%;
   }
-  
+
   #myTable tr.header, #myTable tr:hover {
     background-color: #f1f1f1;
   }
@@ -45,7 +45,7 @@
     width: 80%;
     background: #f1f1f1;
   }
-  
+
   /* Style the submit button */
   form.example button {
     float: left;
@@ -58,19 +58,32 @@
     border-left: none; /* Prevent double borders */
     cursor: pointer;
   }
-  
+
   form.example button:hover {
     background: #0b7dda;
   }
-  
+
   /* Clear floats */
   form.example::after {
     content: "";
     clear: both;
     display: table;
   }
-  
+
+.add-warehouse-button {
+  font-size: 14px;
+  height: 90%;
+  padding: 10px;
+  margin: 1%;
+  float: left;
+}
+
 
   #myTable button{
     margin-right: 5px;
   }
+
+.logout-container {
+  position: fixed;
+  right: 2%
+}

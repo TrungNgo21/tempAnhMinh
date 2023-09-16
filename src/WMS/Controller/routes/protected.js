@@ -9,6 +9,8 @@ const {
 const {
 	getAllWarehouseService,
 	updateWarehouseService,
+	deleteWarehouseService,
+	insertWarehouseService,
 } = require('../../Service/WMSService');
 const { response } = require('express');
 
@@ -44,6 +46,37 @@ router.post('/updatewarehouse', authenticateTokenService, async (req, res) => {
 		}
 	} catch (e) {
 		console.error(e.message);
+	}
+});
+
+router.post('/deletewarehouse', authenticateTokenService, async (req, res) => {
+	try {
+		const response = await deleteWarehouseService(req.userRole, {
+			id: req.body.id,
+		});
+		if (!response.err) {
+			res.send(200);
+		} else {
+			res.send(400);
+		}
+	} catch (e) {
+		console.log(e.message);
+	}
+});
+
+router.post('/createwarehouse', authenticateTokenService, async (req, res) => {
+	try {
+		const response = await insertWarehouseService(
+			req.userRole,
+			req.body.warehouse
+		);
+		if (response.err) {
+			res.send(500);
+		} else {
+			res.send(200);
+		}
+	} catch (e) {
+		console.log(e.message);
 	}
 });
 

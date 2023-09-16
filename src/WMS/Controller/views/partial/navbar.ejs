@@ -1,0 +1,21 @@
+<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav nav-pills nav-justified">
+        <a class="nav-item nav-link active" href="" id='wh-href'>Warehouses</a>
+        <a class="nav-item nav-link" href="#">Inventory</a>
+        <a class="nav-item nav-link" href="#">Category</a>
+    </div>
+    <div class='logout-container'>
+        <a class="btn btn-primary add-warehouse-button" href="/">Logout</a>
+    </div>
+</div>
+
+<link rel="stylesheet" href='/css/whM.css'>
+
+<script>
+	document.addEventListener('DOMContentLoaded', async () => {
+		const urlParam = new URLSearchParams(window.location.search);
+		const token = urlParam.get('token');
+		const whHref = document.getElementById('wh-href')
+		whHref.href = `/protected/?token=${token}`
+	});
+</script>

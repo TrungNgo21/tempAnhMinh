@@ -14,6 +14,94 @@ document.addEventListener('DOMContentLoaded', async () => {
 			await renderDisplay(token, $('#search-value').val());
 		});
 
+	const createModal = document.getElementById('createModal');
+	const commitButton = document.getElementById('commit-create');
+	commitButton.addEventListener('click', async () => {
+		try {
+			const requestOptions = {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					warehouse: {
+						name: createModal.querySelector('#create-name').value,
+						address:
+							createModal.querySelector('#create-address').value,
+						city: createModal.querySelector('#create-city').value,
+						province:
+							createModal.querySelector('#create-province').value,
+						volume: createModal.querySelector('#create-volume')
+							.value,
+					},
+				}),
+			};
+			const res = await fetch(
+				`/protected/createwarehouse?token=${token}`,
+				requestOptions
+			);
+			const response = await res;
+			if (response.ok) {
+				clearTableDisplay();
+				await renderDisplay(token);
+				createModal.querySelector('#createModalLabel').textContent =
+					'Create warehouse success';
+			} else {
+				createModal.querySelector('#createModalLabel').textContent =
+					'Create unsuccessful. User doesnt have permission to create warehouse';
+			}
+		} catch (e) {
+			console.error(e.message);
+		}
+	});
+
+	const deleteButtons = document.querySelectorAll('.delete-product');
+	deleteButtons.forEach((button) => {
+		button.addEventListener('click', () => {
+			const modal = document.getElementById('deleteModal');
+			const id = button.getAttribute('data-id');
+			const fillVolume = button.getAttribute('data-fill');
+			const commitButton = document.getElementById('commit-delete');
+			commitButton.addEventListener('click', async () => {
+				try {
+					const requestOptions = {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify({
+							id: id,
+						}),
+					};
+					if (fillVolume > 0) {
+						console.log(fillVolume);
+						modal.querySelector('#deleteModalLabel').textContent =
+							'Delete product fail, warehouse not empty';
+					} else {
+						const res = await fetch(
+							`/protected/deletewarehouse?token=${token}`,
+							requestOptions
+						);
+						if (await res.ok) {
+							clearTableDisplay();
+							await renderDisplay(token);
+							modal.querySelector(
+								'#deleteModalLabel'
+							).textContent = 'delete warehouse success';
+						} else {
+							modal.querySelector(
+								'#deleteModalLabel'
+							).textContent =
+								'User doesnt have permission to delete';
+						}
+					}
+				} catch (e) {
+					console.error(e.message);
+				}
+			});
+		});
+	});
+
 	const updateButtons = document.querySelectorAll('.update-product');
 
 	updateButtons.forEach((button) => {
@@ -60,7 +148,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 						clearTableDisplay();
 						await renderDisplay(token);
 						modal.querySelector('#updateModalLabel').textContent =
-							'Update product sucess';
+							'Update warehouse sucess';
+					} else {
+						modal.querySelector('#updateModalLabel').textContent =
+							'user doesnt have permission to edit warehouse';
 					}
 				} catch (e) {
 					console.error(e.message);
@@ -138,8 +229,7 @@ async function renderDisplay(token, searchDetail = null) {
 		const whModify = document.createElement('td');
 		whModify.innerHTML += `<button type="button" class="btn btn-primary btn-sm update-product" data-toggle="modal" data-target="#updateModal" data-id="${warehouse.id}" data-name="${warehouse.name}" data-address=" ${warehouse.address}" data-city=" ${warehouse.city}" data-province=" ${warehouse.province}" data-volume ="${warehouse.volume}">Update</button>`;
 
-		whModify.innerHTML +=
-			'<button type="button" class="btn btn-primary btn-sm btn-danger" data-toggle="modal" data-target="#deleteModal">Delete</button>';
+		whModify.innerHTML += `<button type="button" class="btn btn-primary btn-sm btn-danger delete-product" data-toggle="modal" data-target="#deleteModal" data-id="${warehouse.id}" data-fill="${warehouse.fillVolume}">Delete</button>`;
 
 		table_row.append(
 			whName,

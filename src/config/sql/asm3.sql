@@ -409,13 +409,16 @@ end;
 grant select on public.product to warehouse_admin, warehouse_staff, customer;
 
 -- Grant permission for role
+grant select on public.warehouse to warehouse_staff, customer;
+
+-- Grant permission for role
 grant select, insert, update, delete on public.warehouse to warehouse_admin;
 
 -- Grant permission for role
 grant select, insert, update on public.warehouse_inventory to warehouse_staff;
 
 -- Grant permission for role
-grant select, insert, update on public.product to warehouse_staff;
+grant insert, update on public.product to warehouse_staff;
 
 -- Grant permission for role
 grant execute on procedure public.product_purchase_order to warehouse_staff;
@@ -426,11 +429,6 @@ grant execute on procedure public.product_transfer to warehouse_staff;
 -- Grant permission for role
 grant select on public.warehouse_inventory to customer;
 
--- Grant permission for role
-grant select on public.warehouse to customer;
-
--- Grant permission for role
-grant select on public.product to customer;
 
 -- Set role as default for user
 alter user 'whadmin'@'localhost' default role warehouse_admin;
