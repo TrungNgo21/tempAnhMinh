@@ -182,9 +182,9 @@ async function deleteWarehouseService(user, mapObject) {
 	}
 }
 
-async function getAllWarehouseService(user) {
+async function getAllWarehouseService(user, searchString = null) {
 	try {
-		const sqlReturn = await getAllWarehouse(user);
+		const sqlReturn = await getAllWarehouse(user, searchString);
 		if (sqlReturn.err) {
 			return { err: true, message: sqlReturn.message };
 		}

@@ -156,12 +156,14 @@ async function deleteWarehouse(user, deleteWhDTO) {
 	}
 }
 
-async function getAllWarehouse(user) {
+async function getAllWarehouse(user, searchString = null) {
 	try {
-		const result = await queryWrapper(
-			user,
-			'select id, name, address, city, province, volume, fillVolume from warehouse'
-		);
+		let queryString =
+			'select id, name, address, city, province, volume, fillVolume from warehouse';
+		if (searchString) {
+			queryString += ` where name like '${searchString}' or address like '${searchString}' or city like '${searchString}' or province like '${searchString}'`;
+		}
+		const result = await queryWrapper(user, queryString);
 		return { err: false, message: result };
 	} catch (e) {
 		return { err: true, message: e.message };

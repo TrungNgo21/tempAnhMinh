@@ -20,9 +20,8 @@ async function authenticateUserService(mapObject) {
 
 async function authenticateTokenService(req, res, next) {
 	const token = req.query.token;
-
 	if (!token) {
-		return res.redirect('/login?error=TokenNotProvided');
+		return res.redirect('/?error=TokenNotProvided');
 	}
 
 	try {
@@ -30,7 +29,9 @@ async function authenticateTokenService(req, res, next) {
 		const { err, role } = await getUserRole(username);
 		req.userRole = role;
 		next();
-	} catch (e) {}
+	} catch (e) {
+		return res.redirect('/?error=TokenExpired');
+	}
 }
 
 module.exports = {

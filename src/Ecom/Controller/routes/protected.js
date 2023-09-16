@@ -47,28 +47,6 @@ router.get('/', authenticateTokenService, async (req, res) => {
 	}
 });
 
-// router.get('/prod', authenticateTokenService, async (req, res) => {
-// 	try {
-// 		const token = req.query.token;
-// 		let response = await getAvailableProductService({
-// 			category: req.query.category,
-// 		});
-// 		const products = response.products;
-// 		const categories = response.categories;
-// 		if (!response.err) {
-// 			res.status(200).render({
-// 				products: products,
-// 				categories: categories,
-// 				token: token,
-// 			});
-// 		} else {
-// 			res.status(500);
-// 		}
-// 	} catch (e) {
-// 		res.status(500).json({ error: e.message });
-// 	}
-// });
-
 router.get('/productDetail', authenticateTokenService, async (req, res) => {
 	try {
 		const productId = req.query.productId;
