@@ -268,7 +268,6 @@ async function updateUserCart(userId, productId, quantity) {
 			root,
 			`insert into user_cart (userId, productId, quantity) value ('${userId}', '${productId}', '${quantity}') on duplicate key update quantity = quantity + ${quantity}`
 		);
-		console.log(result);
 		if (result.affectedRows === 0) {
 			return { err: true, message: 'error insert values' };
 		}
@@ -285,9 +284,6 @@ async function getUserCart(userId) {
 			root,
 			`select productId, quantity from user_cart where binary userId = '${userId}' order by productId asc `
 		);
-		if (result.length === 0) {
-			return { err: true };
-		}
 		return { err: false, products: result };
 	} catch (e) {
 		return { err: true, message: 'system error' };
@@ -302,6 +298,23 @@ async function removeUserCart(userId, productId) {
 			`delete from user_cart where binary userId = '${userId}' and productId = '${productId}'`
 		);
 		if (result.affectedRows !== 1) {
+			return { err: true };
+		}
+		return { err: false };
+	} catch (e) {
+		return { err: true, message: 'system error' };
+	}
+}
+
+async function makeTransaction(userId, cart) {
+	const root = 'root';
+	try {
+		const aCart = JSON.stringify(cart);
+		const result = await queryWrapper(
+			root,
+			`call create_transaction('${userId}', '${aCart}')`
+		);
+		if (result[0][0].err) {
 			return { err: true };
 		}
 		return { err: false };
@@ -342,4 +355,5 @@ module.exports = {
 	updateUserCart: updateUserCart,
 	getUserCart: getUserCart,
 	removeUserCart: removeUserCart,
+	makeTransaction: makeTransaction,
 };

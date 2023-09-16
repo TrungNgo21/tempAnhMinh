@@ -131,7 +131,6 @@
 // }
 
 async function removeProduct(token, id) {
-	event.preventDefault();
 	try {
 		const requestOptions = {
 			method: 'GET',
@@ -147,4 +146,28 @@ async function removeProduct(token, id) {
 		console.error('Error sending GET request:', error);
 	}
 	console.log('here');
+}
+
+async function makePurchase(token, products) {
+	try {
+		const requestOptions = {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				token: token,
+				cart: products,
+			}),
+		};
+		const res = await fetch(
+			`/protected/makepurchase?token=${token}`,
+			requestOptions
+		);
+		if (!res.err) {
+			window.location.href = `/protected/cart?token=${token}`;
+		}
+	} catch (error) {
+		console.error('Error sending GET request:', error);
+	}
 }

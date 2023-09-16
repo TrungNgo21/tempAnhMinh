@@ -11,58 +11,51 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" ></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js" integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src='/scripts/indexScripts.js'></script>
 <!--    <script src="/scripts/indexScripts.js"></script>-->
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#">Lazada</a>
+    <a class="navbar-brand" href="/protected/?token=<%=token%>">Lazada</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item active">
-          <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Category
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="#">Electronic</a>
-            <a class="dropdown-item" href="#">Food</a>
-          </div>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" href="#">Disabled</a>
-        </li>
+          <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <% let cateSelectId;
+				  if (!!cateSelect._id) {
+                  cateSelectId = cateSelect._id%>
+                  <%=cateSelect.name%>
+                  <%} else {
+                  cateSelectId = null%>
+                  Category
+                  <%}%>
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <button class='dropdown-item' style='padding-left: 10%' onclick='selectCategory("<%=token%>","<%=null%>")'>Select All</button>
+                  <% categories.forEach((category) => {%>
+                  <button class='dropdown-item' style='padding-left: 10%' onclick='selectCategory("<%=token%>","<%=category.id%>")'><%=category.name%></button>
+                  <%if (category.childCategory.length !== 0) {
+					  category.childCategory.forEach((childCate) => { %>
+                        <button class='dropdown-item' style='padding-left: 20%' onclick='selectCategory("<%=token%>","<%=childCate.id%>")'><%=childCate.name%></button>
+                      <%})
+                  }
+                  })%>
+              </div>
+          </li>
       </ul>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <%- include('partial/cartButton');%>
-      <form class="form-inline my-2 my-lg-0">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-      </form>
+        <%- include('partial/searchButton');%>
     </div>
   </nav>
 
 
   <div aria-label="breadcrumb">
     <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="#">Home</a></li>
-      <li class="breadcrumb-item"><a href="#">Electronic</a></li>
-      <li class="breadcrumb-item" aria-current="page">Data</li>
+      <li class="breadcrumb-item"><a href="/protected/?token=<%=token%>">Home</a></li>
     </ol>
-  </div>
-
-  <div class="dropdown" style="left: 1rem;">
-    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-		Filter
-	  </button>
-	  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-		<li><a class="dropdown-item" href="#">Sub cat1</a></li>
-		<li><a class="dropdown-item" href="#">Sub cat2</a></li>
-	  </ul>
   </div>
 
   <section class="section-products" style="padding: 0;">
@@ -75,6 +68,7 @@
                           <div class='product-name'>
                               <%=product.name%>
                           </div>
+                          <div class='product-brand'><%=product.brand%></div>
                       </div>
                   </a>
               <%});%>

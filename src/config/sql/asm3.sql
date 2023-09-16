@@ -130,9 +130,9 @@ create table warehouse_inventory(
 create table transaction(
 	id bigint primary key AUTO_INCREMENT,
 	date timestamp not null default now(),
-	user varchar(255),
-    quantity int not null,
-    price bigint not null,
+	userId varchar(255),
+    quantity int not null default 0,
+    price bigint not null default 0,
     unique (id, date)
 );
 
@@ -144,7 +144,7 @@ create table transaction_detail(
     productId varchar(24) not null,
     quantity int not null,
     price bigint not null,
-    foreign key (id) references Transaction(id),
+    foreign key (transId) references Transaction(id),
     unique (transId, productId)
 );
 
@@ -229,6 +229,55 @@ create trigger ensure_warehouse_volume_validity
         end if;
     end;
 
+-- Drop transaction_trigger
+drop trigger if exists transaction_trigger;
+
+-- Create transaction_trigger
+create trigger transsaction_trigger
+    after insert on transaction_detail
+    for each row
+    begin
+        update transaction t
+            set t.quantity = t.quantity + new.quantity,
+                t.price = t.price + (new.quantity * new.price)
+            where t.id = new.transId;
+    end;
+
+-- Drop ensure_inventory_after_transaction_trigger
+drop trigger if exists ensure_inventory_after_transaction_trigger;
+
+-- Create ensure_inventory_after_transaction_trigger
+create trigger ensure_inventory_after_transaction_trigger
+    after insert on transaction_detail
+    for each row
+    begin
+        declare product_id varchar(255);
+        declare warehouse_id int;
+
+        set product_id = new.productId;
+
+        select wi.warehouseID into warehouse_id
+        from warehouse_inventory wi
+        where wi.productID = product_id
+        order by wi.quantity desc limit 1;
+
+        update warehouse_inventory
+        set quantity = quantity - new.quantity
+        where productID = product_id and warehouseID = warehouse_id;
+    end;
+
+-- Drop empty_user_cart_trigger
+drop trigger if exists empty_user_cart_trigger;
+
+-- Create empty_user_cart_trigger
+create trigger empty_user_cart_trigger
+    after insert on transaction_detail
+    for each row
+    begin
+        select userId into @user from transaction where id = new.transId;
+        delete from user_cart where userId = @user and productId = new.productId;
+    end;
+
 -- Drop transactional procedure to transfer product between inventory
 drop procedure  if exists product_transfer;
 
@@ -274,10 +323,10 @@ begin
     end if;
 end;
 
--- Drop transactional procedure to process as purchase order of a product
+-- Drop transactional procedure to process purchase order of a product
 drop procedure if exists product_purchase_order;
 
--- Create transactional procedure to process as purchase order of a product
+-- Create transactional procedure to process purchase order of a product
 create procedure product_purchase_order(in product_id varchar(24), in qty bigint)
 begin
     declare iqty bigint default 0;
@@ -317,6 +366,43 @@ begin
         select false as err, 'PO success' as message;
     end if;
     drop temporary table if exists temp;
+end;
+
+-- Drop transactional procedure to process transaction of a user cart
+drop procedure if exists create_transaction;
+
+-- Create transactional procedure to process transaction of a user cart
+create procedure create_transaction(in id varchar(255), in product_data JSON)
+begin
+    declare new_bill_id int;
+    declare _index int default 0;
+    declare num_product int;
+    declare _rollback bool default 0;
+    declare continue handler for sqlexception set _rollback = 1;
+
+    start transaction ;
+    insert into transaction(userId) values (id);
+
+    set new_bill_id = LAST_INSERT_ID();
+
+    set num_product = JSON_LENGTH(product_data);
+
+    while _index < num_product do
+        SET @product_id = JSON_UNQUOTE(JSON_EXTRACT(product_data, CONCAT('$[', _index, '].id')));
+        SET @quantity = JSON_EXTRACT(JSON_UNQUOTE(JSON_EXTRACT(product_data, CONCAT('$[', _index, '].quantity'))), '$');
+        SET @price = JSON_EXTRACT(JSON_UNQUOTE(JSON_EXTRACT(product_data, CONCAT('$[', _index, '].price'))), '$');
+        insert into transaction_detail (transId, productId, quantity, price)
+            value (new_bill_id, @product_id, @quantity, @price);
+        set _index = _index + 1;
+        end while;
+
+    if _rollback = 1 then
+        rollback;
+        select true as err, 'transaction failed' as message;
+    else
+        commit;
+        select false as err, 'transaction success' as message;
+    end if;
 end;
 
 -- Grant permission for role

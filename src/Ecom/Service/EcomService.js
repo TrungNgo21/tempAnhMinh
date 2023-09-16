@@ -5,32 +5,55 @@ const {
 	updateUserCart,
 	getUserCart,
 	removeUserCart,
+	makeTransaction,
+	getUserRole,
 } = require('../../Repository/MySqlRepo');
 const { AvailableProdDTO } = require('../../DTO/Product');
 const {
 	getAllProductMongo,
 	getProduct,
 	getCartProduct,
+	getAllCateMongo,
+	getCateMongo,
 } = require('../../Repository/MongodbRepo');
 const {
 	ECOMProdList,
 	ProductDetail,
 	CartProduct,
+	CategoryDTO,
 } = require('../ReturnDTO/ReturnDTO');
 
-async function getAvailableProductService() {
+async function getAvailableProductService(mapObject) {
 	try {
 		const ids = await getAvailableProductMySql('root');
 
 		const productIds = new AvailableProdDTO(ids.message);
 
-		const result = await getAllProductMongo(
-			'customer',
-			productIds.getIds()
-		);
-		const returnDTO = new ECOMProdList(result.message);
+		let cateSelect = {};
+		if (mapObject.category) {
+			const cateSelectReturn = await getCateMongo(
+				'customer',
+				mapObject.category
+			);
+			cateSelect.name = cateSelectReturn.message.name;
+			cateSelect.id = cateSelectReturn.message._id;
+		}
 
-		return { err: false, message: returnDTO.getList() };
+		const productReturn = await getAllProductMongo(
+			'customer',
+			productIds.getIds(),
+			mapObject.category,
+			mapObject.searchString
+		);
+		const productsDTO = new ECOMProdList(productReturn.message);
+		const categoryReturn = await getAllCateMongo('customer');
+		const cateDTO = new CategoryDTO(categoryReturn.message);
+		return {
+			err: false,
+			products: productsDTO.getList(),
+			categories: cateDTO.generateOutput(),
+			categorySelect: cateSelect,
+		};
 	} catch (e) {
 		return { err: true, message: e.message };
 	}
@@ -111,10 +134,26 @@ async function removeCartService(mapObject) {
 	}
 }
 
+async function makePurchaseService(mapObject) {
+	try {
+		const user = await getUser(mapObject.token);
+		if (user.err) {
+			return { err: true };
+		}
+		const cartReturn = await getCartService(mapObject);
+		const cart = cartReturn.message.array;
+		const mysqlReturn = await makeTransaction(user.id, cart);
+		return mysqlReturn;
+	} catch (e) {
+		console.error(e.message);
+	}
+}
+
 module.exports = {
 	getAvailableProductService: getAvailableProductService,
 	getProductDetailService: getProductDetailService,
 	addToCartService: addToCartService,
 	getCartService: getCartService,
 	removeCartService: removeCartService,
+	makePurchaseService: makePurchaseService,
 };

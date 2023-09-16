@@ -50,7 +50,6 @@ img{
     bottom: 0;
     height: 4px;
     width: 80px;
-    background: #12263a;
 }
 .product-link{
     text-decoration: none;
@@ -168,6 +167,15 @@ img{
 
 .shopping-icon{
     padding-left: 4px;
+}
+
+.navbar-collapse {
+    position: fixed;
+    right: 1%
+}
+
+.ml-2 {
+    margin-right: 6px;
 }
 
 @media screen and (min-width: 992px){

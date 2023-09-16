@@ -1,5 +1,6 @@
 const getMongoConn = require('../config/mongodb/connector');
 const mongoose = require('mongoose');
+const { ObjectId } = require('mongodb');
 
 async function insertCategory(user, insertCateDTO) {
 	let conn;
@@ -116,8 +117,18 @@ async function getAllCate(user) {
 
 	try {
 		conn = await getMongoConn(user);
-		const result = await conn.cate.find().sort({ name: 1 }).lean().exec();
-		return { message: JSON.stringify(result), err: false };
+		const popObject = {
+			path: 'parentCate',
+			model: conn.cate,
+			select: '_id name',
+		};
+		const result = await conn.cate
+			.find()
+			.populate(popObject)
+			.sort({ name: 1 })
+			.lean()
+			.exec();
+		return { message: result, err: false };
 	} catch (e) {
 		return { err: true, message: e.message };
 	} finally {
@@ -127,7 +138,26 @@ async function getAllCate(user) {
 	}
 }
 
-async function getAllProduct(user, listId) {
+async function getCate(user, categoryId) {
+	let conn;
+	try {
+		conn = await getMongoConn(user);
+		const result = await conn.cate
+			.find({ _id: categoryId }, 'name')
+			.sort({ name: 1 })
+			.lean()
+			.exec();
+		return { message: result[0], err: false };
+	} catch (e) {
+		return { err: true, message: e.message };
+	} finally {
+		if (!!conn) {
+			await conn.conn.close();
+		}
+	}
+}
+
+async function getAllProduct(user, listId, categoryId, searchString) {
 	let conn;
 	try {
 		conn = await getMongoConn(user);
@@ -142,21 +172,35 @@ async function getAllProduct(user, listId) {
 				select: '_id name',
 			},
 		};
-		if (listId.length === 0) {
-			const result = await conn.product
-				.find()
-				.populate(popObject)
-				.sort({ name: 1 })
-				.lean()
-				.exec();
-			return { err: false, message: result };
+		let query = {};
+		if (listId.length > 0) {
+			query._id = { $in: listId };
+		}
+		if (searchString) {
+			query.$or = [
+				{ name: { $regex: searchString, $options: 'i' } },
+				{ brand: { $regex: searchString, $options: 'i' } },
+				{ color: { $regex: searchString, $options: 'i' } },
+			];
 		}
 		const result = await conn.product
-			.find({ _id: { $in: listId } })
+			.find(query)
 			.populate(popObject)
 			.sort({ name: 1 })
 			.lean()
 			.exec();
+
+		if (categoryId) {
+			const filteredResult = result.filter((product) => {
+				return (
+					categoryId === product.category._id.toString() ||
+					(!!product.category.parentCate &&
+						product.category.parentCate._id.toString() ===
+							categoryId)
+				);
+			});
+			return { err: false, message: filteredResult };
+		}
 		return { err: false, message: result };
 	} catch (e) {
 		throw Error(e.message);
@@ -316,4 +360,5 @@ module.exports = {
 	insertCategoryMongo: insertCategory,
 	getProduct: getProduct,
 	getCartProduct: getCartProduct,
+	getCateMongo: getCate,
 };

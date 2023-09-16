@@ -1,5 +1,3 @@
-const { mongo } = require('mongoose');
-
 class ECOMProdList {
 	constructor(arrayList) {
 		this.array = [];
@@ -84,8 +82,46 @@ class CartProd {
 	}
 }
 
+class Category {
+	constructor(categories) {
+		this.categories = categories;
+	}
+
+	generateOutput() {
+		const topLevelCategories = this.categories.filter(
+			(category) => !category.parentCate
+		);
+		const output = topLevelCategories.map((category) => {
+			return {
+				id: category._id.toString(),
+				name: category.name,
+				childCategory: this.getChildCategories(category._id),
+			};
+		});
+		return output;
+	}
+
+	// Helper method to get child categories recursively
+	getChildCategories(parentId) {
+		const childCategories = this.categories.filter(
+			(category) =>
+				category.parentCate && category.parentCate._id.equals(parentId)
+		);
+
+		const childCategoryOutput = childCategories.map((childCategory) => {
+			return {
+				id: childCategory._id.toString(),
+				name: childCategory.name,
+				childCategory: [],
+			};
+		});
+		return childCategoryOutput;
+	}
+}
+
 module.exports = {
 	ECOMProdList: ECOMProdList,
 	ProductDetail: ECOMProdDetail,
 	CartProduct: CartProd,
+	CategoryDTO: Category,
 };

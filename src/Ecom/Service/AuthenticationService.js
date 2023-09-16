@@ -19,11 +19,11 @@ async function authenticateUserService(mapObject) {
 }
 
 async function authenticateTokenService(req, res, next) {
-	// console.log(req.query.token);
+	console.log(req.query.token);
 	const token = req.query.token;
 
 	if (!token) {
-		return res.redirect('/login?error=TokenNotProvided');
+		return res.redirect('/');
 	}
 
 	try {
@@ -31,7 +31,10 @@ async function authenticateTokenService(req, res, next) {
 		const { err, role } = await getUserRole(username);
 		req.userRole = role;
 		next();
-	} catch (e) {}
+	} catch (e) {
+		console.log(e.message);
+		return res.redirect('/?error=TokenNotProvided');
+	}
 }
 
 module.exports = {
