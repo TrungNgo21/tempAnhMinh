@@ -16,6 +16,7 @@ const {
 	getAllWarehouse,
 	updateInventoryMySql,
 	transferInventMySql,
+	getInventory,
 } = require('../../Repository/MySqlRepo');
 const {
 	InsertWarehouseDTO,
@@ -28,6 +29,7 @@ const {
 	DeleteCateDTO,
 } = require('../../DTO/Category');
 const { UpdateInventoryDTO, TransferDTO } = require('../../DTO/Inventory');
+const { InventoryDTO } = require('../ReturnDTO/InventoryDTO');
 
 async function insertProductService(user, mapObject) {
 	try {
@@ -242,6 +244,29 @@ async function deleteCategoryService(user, mapObject) {
 	}
 }
 
+async function getInventoryService(mapObject) {
+	try {
+		const warehouseReturn = await getAllWarehouseService(mapObject.user);
+		const inventoryReturn = await getInventory(mapObject.user);
+		let listProductIds = [];
+		inventoryReturn.message.forEach((inventory) => {
+			listProductIds.push(inventory.productId);
+		});
+		const productReturn = await getAllProductMongo(
+			mapObject.user,
+			listProductIds
+		);
+		const returnDTO = new InventoryDTO(
+			warehouseReturn.message,
+			inventoryReturn.message,
+			productReturn.message
+		);
+		return returnDTO.outputData();
+	} catch (e) {
+		return { err: true, message: e.message };
+	}
+}
+
 module.exports = {
 	insertProductService: insertProductService,
 	updateProductDTOService: updateProductService,
@@ -255,4 +280,5 @@ module.exports = {
 	insertCategoryService: insertCategoryService,
 	updateCategoryService: updateCategoryService,
 	deleteCategoryService: deleteCategoryService,
+	getInventoryService: getInventoryService,
 };

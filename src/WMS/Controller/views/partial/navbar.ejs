@@ -1,8 +1,8 @@
 <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
     <div class="navbar-nav nav-pills nav-justified">
-        <a class="nav-item nav-link active" href="" id='wh-href'>Warehouses</a>
-        <a class="nav-item nav-link" href="#">Inventory</a>
-        <a class="nav-item nav-link" href="#">Category</a>
+        <a class="nav-item nav-link" href="" id='wh-href'>Warehouses</a>
+        <a class="nav-item nav-link" href="#" id='invent-href'>Inventory</a>
+        <a class="nav-item nav-link" href="#" id='cate-href'>Category</a>
     </div>
     <div class='logout-container'>
         <a class="btn btn-primary add-warehouse-button" href="/">Logout</a>
@@ -16,6 +16,10 @@
 		const urlParam = new URLSearchParams(window.location.search);
 		const token = urlParam.get('token');
 		const whHref = document.getElementById('wh-href')
+		const inventHref = document.getElementById('invent-href')
+        const cateHref = document.getElementById('cate-href')
 		whHref.href = `/protected/?token=${token}`
+		inventHref.href = `/protected/inventoryManagement?token=${token}`
+
 	});
 </script>

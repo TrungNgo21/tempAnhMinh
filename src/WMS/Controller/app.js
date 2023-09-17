@@ -16,16 +16,6 @@ app.use('/', require('./routes/auth'));
 
 app.use('/protected', require('./routes/protected'));
 
-// app.get('/inventoryManagement', (req, res) => {
-// 	res.render('inventoryManagement.ejs', { title: 'WMS Home' });
-// });
-//
-// app.get('/displayInvent', async (req, res) => {
-// 	try {
-// 		let response = fake_invent;
-// 		await res.send(response);
-// 	} catch (e) {}
-// });
 //
 // const fake_invent = [
 // 	{
@@ -51,6 +41,7 @@ app.use('/protected', require('./routes/protected'));
 // 			},
 // 		],
 // 	},
+// ];
 //
 // 	{
 // 		warehouse: {

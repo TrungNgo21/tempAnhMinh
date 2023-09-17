@@ -1,10 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
 	const urlParam = new URLSearchParams(window.location.search);
 	const token = urlParam.get('token');
-	const rendered = false;
-	if (!rendered) {
-		await renderDisplay(token);
-	}
+	await renderDisplay(token);
 
 	document
 		.getElementById('search-button')

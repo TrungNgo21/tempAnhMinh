@@ -11,6 +11,7 @@ const {
 	updateWarehouseService,
 	deleteWarehouseService,
 	insertWarehouseService,
+	getInventoryService,
 } = require('../../Service/WMSService');
 const { response } = require('express');
 
@@ -75,6 +76,20 @@ router.post('/createwarehouse', authenticateTokenService, async (req, res) => {
 		} else {
 			res.send(200);
 		}
+	} catch (e) {
+		console.log(e.message);
+	}
+});
+
+router.get('/inventoryManagement', authenticateTokenService, (req, res) => {
+	res.render('inventoryManagement.ejs');
+});
+
+router.post('/displayInvent', authenticateTokenService, async (req, res) => {
+	try {
+		const response = await getInventoryService({ user: req.userRole });
+		console.log(response);
+		res.send(response);
 	} catch (e) {
 		console.log(e.message);
 	}

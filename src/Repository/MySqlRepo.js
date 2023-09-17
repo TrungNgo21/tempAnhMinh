@@ -325,6 +325,18 @@ async function makeTransaction(userId, cart) {
 	}
 }
 
+async function getInventory(user) {
+	try {
+		const result = await queryWrapper(
+			user,
+			'select warehouseId, productId, quantity from warehouse_inventory'
+		);
+		return { err: false, message: result };
+	} catch (e) {
+		return { err: true, message: 'system error' };
+	}
+}
+
 async function queryWrapper(user, sql) {
 	let conn;
 	try {
@@ -358,4 +370,5 @@ module.exports = {
 	getUserCart: getUserCart,
 	removeUserCart: removeUserCart,
 	makeTransaction: makeTransaction,
+	getInventory: getInventory,
 };

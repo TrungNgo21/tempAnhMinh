@@ -119,11 +119,11 @@ create table warehouse(
 -- Create warehouse_inventory table
 create table warehouse_inventory(
 	id bigint primary key AUTO_INCREMENT,
-	warehouseID int not null,
-    productID varchar(24) not null,
+	warehouseId int not null,
+    productId varchar(24) not null,
 	quantity bigint not null,
-    foreign key (warehouseID) references warehouse(id),
-    unique (warehouseID, productID)
+    foreign key (warehouseId) references warehouse(id),
+    unique (warehouseId, productId)
 );
 
 -- Create transaction table

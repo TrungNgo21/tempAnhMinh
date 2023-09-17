@@ -5,11 +5,11 @@
 
   #myTable {
     border-collapse: collapse;
-    width: 70%;
+    width: 90%;
     border: 1px solid #ddd;
     font-size: 15px;
     margin: auto;
-    table-layout: fixed;
+    table-layout: auto;
   }
 
   #myTable th, #myTable td {

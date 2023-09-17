@@ -1,17 +1,22 @@
 * {
     box-sizing: border-box;
   }
-  
+
+#myTable {
+  border-collapse: collapse;
+}
+
   #myTable th, #myTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
     text-align: left;
-    padding: 12px;
   }
-  
+
   #myTable tr {
     border-bottom: 1px solid #ddd;
     line-height: 80%;
   }
-  
+
   #myTable tr.header, #myTable tr:hover {
     background-color: #f1f1f1;
   }
@@ -35,7 +40,7 @@
     width: 80%;
     background: #f1f1f1;
   }
-  
+
   /* Style the submit button */
   form.example button {
     float: left;
@@ -48,18 +53,39 @@
     border-left: none; /* Prevent double borders */
     cursor: pointer;
   }
-  
+
   form.example button:hover {
     background: #0b7dda;
   }
-  
+
   /* Clear floats */
   form.example::after {
     content: "";
     clear: both;
     display: table;
   }
-  
-  .hiddenRow {
+
+  .hidden-row {
+    display: none;
     padding: 0 !important;
 }
+  .inventory-row {
+    cursor: pointer;
+  }
+
+  .hidden-header{
+    display: table-header-group;
+  }
+
+  .row-container{
+    display: flex;
+    flex-direction: row;
+  }
+
+  .transfer-button{
+    font-size: 14px;
+    height: 100%;
+    padding: 10px;
+    margin: 1%;
+    float: left;
+  }
