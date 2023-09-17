@@ -1,0 +1,69 @@
+* {
+    box-sizing: border-box;
+  }
+  
+  #cateTable th, #cateTable td {
+    text-align: left;
+    padding: 12px;
+  }
+  
+  #cateTable tr {
+    border-bottom: 1px solid #ddd;
+    line-height: 80%;
+  }
+  
+  #cateTable tr.header, #cateTable tr:hover {
+    background-color: #f1f1f1;
+  }
+
+  .search_form{
+    display: flex;
+    justify-content: center;
+  }
+
+  form.example {
+    width: 40%;
+    align-self: center;
+    margin: 1%;
+  }
+
+  form.example input[type=text] {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid grey;
+    float: left;
+    width: 80%;
+    background: #f1f1f1;
+  }
+  
+  /* Style the submit button */
+  form.example button {
+    float: left;
+    width: 20%;
+    padding: 10px;
+    background: #2196F3;
+    color: white;
+    font-size: 14px;
+    border: 1px solid grey;
+    border-left: none; /* Prevent double borders */
+    cursor: pointer;
+  }
+  
+  form.example button:hover {
+    background: #0b7dda;
+  }
+  
+  /* Clear floats */
+  form.example::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
+  
+  .hiddenRow {
+    padding: 0 !important;
+}
+
+#cateTable li{
+  margin: 5px;
+}
