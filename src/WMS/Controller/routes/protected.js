@@ -12,6 +12,7 @@ const {
 	deleteWarehouseService,
 	insertWarehouseService,
 	getInventoryService,
+	getAllCategoryService, getAllProductService
 } = require('../../Service/WMSService');
 const { response } = require('express');
 
@@ -94,5 +95,23 @@ router.post('/displayInvent', authenticateTokenService, async (req, res) => {
 		console.log(e.message);
 	}
 });
+
+router.get('/categoryManagement', authenticateTokenService, async (req, res) =>{
+	try{
+		const cateList = await getAllCategoryService(req.userRole)
+		res.render('categoryManagement.ejs', {cateList: cateList.message, token: req.query.token});
+	}catch (e){
+		return {error: e, message: e.message}
+	}
+})
+
+router.get(`/getAllCateProduct`, authenticateTokenService, async (req, res) =>{
+	try{
+		const products = await getAllProductService(req.userRole)
+		res.send({data: products.message});
+	}catch (e){
+		return {error: e, message: e.message}
+	}
+})
 
 module.exports = router;

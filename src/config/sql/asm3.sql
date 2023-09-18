@@ -1,3 +1,4 @@
+SET GLOBAL validate_password.policy = LOW;
 -- Drop role
 drop role if exists warehouse_admin;
 

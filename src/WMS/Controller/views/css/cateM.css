@@ -1,6 +1,16 @@
 * {
     box-sizing: border-box;
   }
+
+  #wrapper{
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
   
   #cateTable th, #cateTable td {
     text-align: left;
@@ -19,6 +29,90 @@
   .search_form{
     display: flex;
     justify-content: center;
+    align-items: center;
+    column-gap: 4px;
+    width: 100%;
+  }
+
+  .btn-create{
+    margin: 0px 4px;
+  }
+
+  .cate-products--container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 90%;
+    height: 80vh;
+  }
+
+  .cate--container{
+    width: 35%;
+    height: 100%;
+    border: 1px solid black;
+  }
+
+  ul.expandable-cate{
+    list-style: none;
+    margin: 16px;
+    width: 100%;
+  }
+
+  ul.expandable-cate li{
+    border: 1px solid black;
+    border-radius: 4px;
+    /*width: 100%;*/
+    /*margin-left: 16px;*/
+    margin: 8px;
+    padding: 8px;
+  }
+
+  ul.expandable-cate li.children-cate{
+    margin-left: 28px;
+  }
+
+  li.cate-content, li.children-cate{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+
+  .cate-tree{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    row-gap: 4px;
+  }
+
+  #products--container{
+    height: 100%;
+    width: 60%;
+    border: 1px solid black;
+  }
+
+  .product-content{
+    display: flex;
+    align-items: center;
+    border: 1px solid black;
+    padding: 8px;
+    margin: 8px;
+  }
+
+  .product-des--container{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 70%;
+  }
+
+
+  .name-price--container, .brand-cate--container{
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
   }
 
   form.example {

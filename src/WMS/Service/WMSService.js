@@ -6,6 +6,7 @@ const {
 	updateProductMongo,
 	deleteCategoryMongo,
 	getAllProductMongo,
+	getAllCateMongo,
 } = require('../../Repository/MongodbRepo');
 const {
 	insertProductMySql,
@@ -30,6 +31,7 @@ const {
 } = require('../../DTO/Category');
 const { UpdateInventoryDTO, TransferDTO } = require('../../DTO/Inventory');
 const { InventoryDTO } = require('../ReturnDTO/InventoryDTO');
+const timers = require("timers");
 
 async function insertProductService(user, mapObject) {
 	try {
@@ -263,7 +265,16 @@ async function getInventoryService(mapObject) {
 		);
 		return returnDTO.outputData();
 	} catch (e) {
-		return { err: true, message: e.message };
+		return {err: true, message: e.message};
+	}
+}
+
+async function getAllCategoryService(user){
+	try{
+		const categories = await getAllCateMongo(user);
+		return categories;
+	}catch (e){
+		return {error: true, message: e.message}
 	}
 }
 
@@ -280,5 +291,6 @@ module.exports = {
 	insertCategoryService: insertCategoryService,
 	updateCategoryService: updateCategoryService,
 	deleteCategoryService: deleteCategoryService,
+	getAllCategoryService: getAllCategoryService,
 	getInventoryService: getInventoryService,
 };

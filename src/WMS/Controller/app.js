@@ -8,10 +8,14 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
-app.use(express.static(path.join(__dirname, 'views')));
-app.use('/views', express.static(path.join(__dirname, '')));
+// app.use(express.static(path.join(__dirname, 'views')));
+// app.use('/views', express.static(path.join(__dirname, '')));
+// app.set('views', path.join(__dirname, 'views'));
 
+
+app.use(express.static(path.join(__dirname, '/views')));
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 app.use('/', require('./routes/auth'));
 
 app.use('/protected', require('./routes/protected'));

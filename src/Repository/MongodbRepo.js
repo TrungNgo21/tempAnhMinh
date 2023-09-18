@@ -114,9 +114,9 @@ async function deleteCategory(user, updateCateDTO) {
 
 async function getAllCate(user) {
 	let conn;
-
 	try {
 		conn = await getMongoConn(user);
+
 		const popObject = {
 			path: 'parentCate',
 			model: conn.cate,

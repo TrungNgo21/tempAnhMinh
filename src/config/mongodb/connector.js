@@ -13,6 +13,9 @@ async function getMongoConn(user) {
 	const username = encodeURIComponent(user);
 	const password = encodeURIComponent(cred[user]);
 
+	console.log(username)
+	console.log(password)
+
 	const url = '127.0.0.1:27017';
 	const authMechanism = 'SCRAM-SHA-256';
 
